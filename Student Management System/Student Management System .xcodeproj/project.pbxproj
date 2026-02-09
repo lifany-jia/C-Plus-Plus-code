@@ -19,7 +19,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
-		FE4D52662F1B54FF008889B5 /* Student Management System */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Student Management System"; sourceTree = BUILT_PRODUCTS_DIR; };
+		FE4D52742F1CA6CE008889B5 /* Student Management System */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = "Student Management System"; sourceTree = BUILT_PRODUCTS_DIR; };
 /* End PBXFileReference section */
 
 /* Begin PBXFileSystemSynchronizedRootGroup section */
@@ -45,16 +45,8 @@
 			isa = PBXGroup;
 			children = (
 				FE4D52682F1B54FF008889B5 /* Student Management System */,
-				FE4D52672F1B54FF008889B5 /* Products */,
+				FE4D52742F1CA6CE008889B5 /* Student Management System */,
 			);
-			sourceTree = "<group>";
-		};
-		FE4D52672F1B54FF008889B5 /* Products */ = {
-			isa = PBXGroup;
-			children = (
-				FE4D52662F1B54FF008889B5 /* Student Management System */,
-			);
-			name = Products;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -79,7 +71,7 @@
 			packageProductDependencies = (
 			);
 			productName = "Student Management System";
-			productReference = FE4D52662F1B54FF008889B5 /* Student Management System */;
+			productReference = FE4D52742F1CA6CE008889B5 /* Student Management System */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -93,10 +85,11 @@
 				TargetAttributes = {
 					FE4D52652F1B54FF008889B5 = {
 						CreatedOnToolsVersion = 26.2;
+						LastSwiftMigration = 2620;
 					};
 				};
 			};
-			buildConfigurationList = FE4D52612F1B54FF008889B5 /* Build configuration list for PBXProject "Student Management System" */;
+			buildConfigurationList = FE4D52612F1B54FF008889B5 /* Build configuration list for PBXProject "Student Management System " */;
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
 			knownRegions = (
@@ -106,7 +99,7 @@
 			mainGroup = FE4D525D2F1B54FF008889B5;
 			minimizedProjectReferenceProxies = 1;
 			preferredProjectObjectVersion = 77;
-			productRefGroup = FE4D52672F1B54FF008889B5 /* Products */;
+			productRefGroup = FE4D525D2F1B54FF008889B5;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
@@ -244,23 +237,28 @@
 		FE4D526E2F1B54FF008889B5 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 6.0;
 			};
 			name = Debug;
 		};
 		FE4D526F2F1B54FF008889B5 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
 				CODE_SIGN_STYLE = Automatic;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 6.0;
 			};
 			name = Release;
 		};
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		FE4D52612F1B54FF008889B5 /* Build configuration list for PBXProject "Student Management System" */ = {
+		FE4D52612F1B54FF008889B5 /* Build configuration list for PBXProject "Student Management System " */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				FE4D526B2F1B54FF008889B5 /* Debug */,
