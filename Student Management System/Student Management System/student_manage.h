@@ -48,7 +48,7 @@ public:
     void sortByAverageScore(bool ascending = true);
     void sortBySubjectScore(const std::string& subjectName, bool ascending = true);
     
-    int getTotalPages(int pagaSize) const;
+    int getTotalPages(int pageSize) const;
     StudentNode* getPageStart(int pageIndex, int pageSize) const;
     
     StudentNode* getHead() const;

@@ -124,4 +124,102 @@ bool StudentManage::removeStudentSubjectScore(int id, const std::string &subject
 }
 
 // 排序
+void StudentManage::sortByTotalScore(bool ascending) {
+    if (size < 2) {
+        return;
+    }
+    bool swapped;
+    do {
+        swapped = false;
+        StudentNode* curr = head;
+        while (curr && curr->next) {
+            int a = curr->data.getTotalScore();
+            int b = curr->next->data.getTotalScore();
+            bool shouldSwap = ascending ? (a > b) : (a < b);
+            if (shouldSwap) {
+                swapNode(curr, curr->next);
+                swapped = true;
+            }
+            curr = curr->next;
+        }
+    } while (swapped);
+}
 
+void StudentManage::sortByAverageScore(bool ascending) {
+    if (size < 2) {
+        return ;
+    }
+    bool swapped;
+    do {
+        swapped = false;
+        StudentNode* curr = head;
+        while (curr && curr->next) {
+            double a = curr->data.getAverageScore();
+            double b = curr->next->data.getAverageScore();
+            bool shouldSwap = ascending ? (a > b) : (a < b);
+            if (shouldSwap) {
+                swapNode(curr, curr->next);
+                swapped = true;
+            }
+            curr = curr->next;
+        }
+    } while (swapped);
+}
+
+void StudentManage::sortBySubjectScore(const std::string &subjectName, bool ascending){
+    if (size < 2) return;
+    bool swapped;
+    do {
+        swapped = false;
+        StudentNode* curr = head;
+        while (curr && curr->next) {
+            int a, b;
+            bool hasa = curr->data.getSubjectScore(subjectName, a);
+            bool hasb = curr->next->data.getSubjectScore(subjectName, b);
+            if (!hasa) a = -1;
+            if (!hasb) b = -1;
+            bool shouldSwap = false;
+            if (ascending) {
+                // 升序，无科目排最后
+                shouldSwap = (a > b) || (a == -1 && b != -1);
+            } else {
+                shouldSwap = (a < b) || (a == -1 && b != -1);
+            }
+            if (shouldSwap) {
+                swapNode(curr, curr->next);
+                swapped = true;
+            }
+            curr = curr->next;
+        }
+    }while (swapped);
+}
+
+int StudentManage::getTotalPages(int pageSize) const {
+    if (pageSize <= 0) return 0;
+    return (size + pageSize - 1) / pageSize;
+    // 向上取整
+}
+StudentNode* StudentManage::getPageStart(int pageIndex, int pageSize) const {
+    if (pageIndex < 1 || pageSize <= 0) {
+        return nullptr;
+    }
+    int startPos = (pageIndex - 1) * pageSize;
+    // 例子：找第2页，每页3个
+    // startPos = (2-1) * 3 = 3
+    // 意思：跳过前3个学生，从第4个开始（因为从0开始数）
+    if (startPos >= size) {
+        return nullptr;
+    }
+    StudentNode* curr = head;
+    for (int i = 0; i < startPos && curr; i++) {
+        curr = curr->next;
+    }
+    return curr;
+}
+
+StudentNode* StudentManage::getHead() const {
+    return head;
+}
+StudentNode* StudentManage::getTail() const {
+    return tail;
+}
