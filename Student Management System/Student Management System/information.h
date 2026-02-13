@@ -32,6 +32,7 @@ public:
     int getId() const;
     std::string getName() const;
     std::string getClassName() const;
+    Subject* getSubjectHead() const;
     
     void setName(const std::string& name);
     void setClassName(const std::string& className);

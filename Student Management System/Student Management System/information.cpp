@@ -38,6 +38,9 @@ std::string Information::getName() const {
 std::string Information::getClassName() const {
     return className;
 }
+Subject* Information::getSubjectHead() const {
+    return subjectHead;
+}
 
 // Setter
 void Information::setName(const std::string& name) {
