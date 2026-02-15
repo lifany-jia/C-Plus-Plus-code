@@ -29,7 +29,7 @@ private:
     static void setError(const std::string& error);
 public:
     enum Format {
-        BINARY, TEXT
+        BINARY, TEXT, UNKNOWN
     };
     static bool save(const StudentManage& manager, const std::string& filename, Format format = BINARY);
     static bool load(StudentManage& manager, const std::string& filename);
