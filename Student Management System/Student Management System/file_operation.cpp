@@ -7,9 +7,7 @@
 #include "file_operation.h"
 #include <fstream>
 #include <iostream>
-#include <sstream>
 #include <cstring>
-#include <algorithm>
 
 using namespace std;
 
