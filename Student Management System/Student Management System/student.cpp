@@ -16,8 +16,8 @@
 
 using namespace std;
 
-StudentUI::StudentUI(StudentManage* mgr)
-    :manager(mgr), isLoggedIn(false){
+StudentUI::StudentUI(StudentManage* mgr, Auth* auth)
+    :manager(mgr), auth(auth), isLoggedIn(auth->isLoggedInStatus()){
 }
 
 void StudentUI::clearScreen() {
@@ -433,12 +433,106 @@ void StudentUI::queryMenu() {
     while (true) {
         clearScreen();
         cout << "============================" << endl;
-        cout << "          成绩查询菜单" << endl;
+        cout << "          📖成绩查询菜单" << endl;
         cout << "============================" << endl;
         cout << "1. 查询我的成绩" << endl;
         cout << "2. 查询本班成绩" << endl;
         cout << "3. 返回上一级" << endl;
         cout << "============================" << endl;
-        cout << "请选择："; 
+        cout << "请选择：";
+        int choice;
+        cin >> choice;
+        cout << endl;
+        switch (choice) {
+            case 1:
+                queryMyScores();
+                break;
+            case 2:
+                queryClassScores();
+            case 3:
+                return;
+            default:
+                cout << "无效选择，请重新输入！" << endl;
+                waitForEnter();
+        }
+    }
+}
+
+void StudentUI::analysisMenu() {
+    while (true) {
+        clearScreen();
+        cout << "============================" << endl;
+        cout << "         🧐成绩分析菜单" << endl;
+        cout << "============================" << endl;
+        cout << "1. 班级排名" << endl;
+        cout << "2. 返回上一级" << endl;
+        cout << "============================" << endl;
+        cout << "请选择：";
+        int choice;
+        cin >> choice;
+        cout << endl;
+        switch (choice) {
+            case 1:
+                showClassRanking();
+                break;
+            case 2:
+                return;
+            default:
+                cout << "无效选择，请重新输入！" << endl;
+                waitForEnter();
+        }
+    }
+}
+
+void StudentUI::showMainMenu() {
+    while (isLoggedIn) {
+        clearScreen();
+        cout << "============================" << endl;
+        cout << "       🧑‍🎓学生成绩查询系统" << endl;
+        cout << "============================" << endl;
+        cout << "当前用户：" << currentStudentName << endl;
+        cout << "班   级：" << currentClass << endl;
+        cout << "============================" << endl;
+        cout << "1. 成绩查询" << endl;
+        cout << "2. 成绩分析" << endl;
+        cout << "3. 修改密码" << endl;
+        cout << "4. 退出登录" << endl;
+        cout << "请选择（1-4）：";
+        int choice;
+        cin >> choice;
+        switch (choice) {
+            case 1:
+                queryMenu();
+                break;
+            case 2:
+                analysisMenu();
+                break;
+            case 3:
+                auth->changePassword();
+                break;
+            case 4:
+                isLoggedIn = false;
+                auth->logout();
+                cout << "已退出登录！" << endl;
+                waitForEnter();
+            default:
+                cout << "无效选择，请重新输入！" << endl;
+                waitForEnter();
+        }
+    }
+}
+
+void StudentUI::run() {
+    while (true) {
+        if (!isLoggedIn) {
+            bool loginSuccess = login();
+            if (!loginSuccess) {
+                cout << "返回主菜单..." << endl;
+                waitForEnter();
+                break;
+            }
+        } else {
+            showMainMenu();
+        }
     }
 }

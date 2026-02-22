@@ -37,7 +37,7 @@ private:
     void clearScreen();
     
 public:
-    StudentUI(StudentManage*mgr);
+    StudentUI(StudentManage*mgr, Auth* auth);
     void run();
 };
 #endif
