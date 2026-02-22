@@ -5,6 +5,9 @@
 //  Created by lifany on 2026/1/18.
 //
 #include "student_manage.h"
+#include <utility>
+#include <vector>
+#include <algorithm>
 
 StudentNode::StudentNode(const Information& info)
     :data(info), prev(nullptr), next(nullptr) {
@@ -223,3 +226,54 @@ StudentNode* StudentManage::getHead() const {
 StudentNode* StudentManage::getTail() const {
     return tail;
 }
+
+bool StudentManage::getStudentRank(int studentId, int& myRank) const {
+    const Information* currStudent = getStudentById(studentId);
+    if (!currStudent) return false;
+    std::vector<std::pair<int, int>> classTotalScore;
+    StudentNode* curr = getHead();
+    while (curr) {
+        classTotalScore.push_back({curr->data.getId(), curr->data.getTotalScore()});
+        curr = curr->next;
+    }
+    std::sort(classTotalScore.begin(), classTotalScore.end(),
+              [](const auto& a, const auto& b) {
+        return a.second > b.second;
+    });
+    bool found = false;
+    for (int i = 0; i < classTotalScore.size(); i++) {
+        if (classTotalScore[i].first == studentId) {
+            myRank = i + 1;
+            return true;
+        }
+    }
+    return false;
+}
+
+bool StudentManage::getStudentRank(int studentId, const std::string &subjectName, int& myRank) const {
+    const Information* currStudent = getStudentById(studentId);
+    if (!currStudent) return false;
+    std::vector<std::pair<int, int>> classScores;
+    StudentNode* curr = getHead();
+    while (curr) {
+        int score;
+        if (curr->data.getSubjectScore(subjectName, score)) {
+            classScores.push_back({curr->data.getId(), score});
+        }
+        curr = curr->next;
+    }
+    std::sort(classScores.begin(), classScores.end(),
+              [](const auto& a, const auto& b) {
+        return a.second > b.second;
+    });
+    bool found = false;
+    for (int i = 0; i < classScores.size(); i++) {
+        if (classScores[i].first == studentId) {
+            myRank = i + 1;
+            return true;
+        }
+    }
+    return false;
+}
+
+

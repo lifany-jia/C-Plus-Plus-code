@@ -72,7 +72,6 @@ bool Auth::registerUser() {
     newUser.password = password;
     newUser.role = role;
     users[userId] = newUser;
-    cout << "✅ 用户注册成功！" << endl;
     return true;
 }
 

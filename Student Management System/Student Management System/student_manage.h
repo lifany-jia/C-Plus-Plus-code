@@ -48,6 +48,10 @@ public:
     void sortByAverageScore(bool ascending = true);
     void sortBySubjectScore(const std::string& subjectName, bool ascending = true);
     
+    bool getStudentRank(int studentId, int& myRank) const;  // 总分排名
+    bool getStudentRank(int studentId, const std::string& subjectName, int& myRank) const;
+    void showClassRank();
+    
     int getTotalPages(int pageSize) const;
     StudentNode* getPageStart(int pageIndex, int pageSize) const;
     
