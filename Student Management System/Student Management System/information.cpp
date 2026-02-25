@@ -96,16 +96,15 @@ bool Information::removeSubject(const std::string &subjectName) {
     return false;
 }
 
-bool Information::getSubjectScore(const std::string &subjectName, int &score) const {
+int Information::getSubjectScore(const std::string &subjectName) const {
     Subject* curr = subjectHead;
     while (curr) {
         if (curr->name == subjectName) {
-            score = curr->score;
-            return true;
+            return curr->score;
         }
         curr = curr->next;
     }
-    return false;
+    return -1;
 }
 
 int Information::getTotalScore() const {

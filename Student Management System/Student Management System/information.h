@@ -40,7 +40,7 @@ public:
     bool addSubject(const std::string& subjectName, int score);
     bool updateSubjectScore(const std::string& subjectName, int score);
     bool removeSubject(const std::string& subjectName);
-    bool getSubjectScore(const std::string& subjectName, int& score) const;
+    int getSubjectScore(const std::string& subjectName) const;
     
     int getTotalScore() const;
     int getScoreCount() const;

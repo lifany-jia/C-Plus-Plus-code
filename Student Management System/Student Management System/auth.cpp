@@ -15,68 +15,8 @@ Auth::Auth()
     :isLoggedIn(false) {
 }
 
-bool Auth::registerUser() {
-    cout << "==========用户注册==========" << endl;
-    cout << "(输入0退出注册)" <<endl;
-    string userId;
-    while (true) {
-        cout << "请输入您的ID：";
-        cin >> userId;
-        cout << endl;
-        if (userId == "0") {
-            cout << "已退出注册页面！" << endl;
-            return false;
-        }
-        if (users.find(userId) != users.end()) {
-            cout << "❌ 该用户已存在" << endl;
-            continue;
-        }
-        if (userId.empty()) {
-            cout << "❌ ID不能为空！" << endl;
-            continue;
-        }
-        break;
-    }
-    string role;
-    while (true) {
-        cout << "请输入您的角色：(student/teacher/admin)";
-        cin >> role;
-        cout << endl;
-        if (role == "0") {
-            cout << "已退出注册页面！" << endl;
-            return false;
-        }
-        if (role != "student" && role != "teacher" && role != "admin") {
-            cout << "❌ 角色必须是 student/teacher/admin" << endl;
-            continue;
-        }
-        break;
-    }
-    string password;
-    while (true) {
-        cout << "请输入您的密码：(不少于六位)";
-        cin >> password;
-        cout << endl;
-        if (password == "0") {
-            cout << "已退出注册页面！" << endl;
-            return false;
-        }
-        if (password.length() < 6) {
-            cout << "❌ 密码至少为六位!" << endl;
-            continue;
-        }
-        break;
-    }
-    User newUser;
-    newUser.userId = userId;
-    newUser.password = password;
-    newUser.role = role;
-    users[userId] = newUser;
-    return true;
-}
-
 bool Auth::login() {
-    cout << "==========用户登录==========" << endl;
+    cout << "==========登录==========" << endl;
     cout << "(输入0退出登录)" << endl;
     string userId;
     auto it = users.end();
@@ -84,10 +24,7 @@ bool Auth::login() {
         cout << "请输入您的ID：" ;
         cin >> userId;
         cout << endl;
-        if (userId == "0") {
-            cout << "已退出登录！" << endl;
-            return false;
-        }
+        if (userId == "0") return false;
         it = users.find(userId);
         if (it == users.end()) {
             cout << "❌该用户不存在" << endl;
@@ -110,10 +47,7 @@ bool Auth::login() {
         cout << endl;
         curr++;
         
-        if (password == "0") {
-            cout << "已退出登录页面！" << endl;
-            return false;
-        }
+        if (password == "0") return false;
         if (it->second.password != password) {
             cout << "❌密码错误" << endl;
             continue;
@@ -130,6 +64,14 @@ bool Auth::login() {
 void Auth::logout() {
     currentUserId = "";
     isLoggedIn = false;
+}
+
+bool Auth::addUser(const User &user) {
+    if (users.find(user.userId) != users.end()) {
+        return false;
+    }
+    users[user.userId] = user;
+    return true;
 }
 
 bool Auth::changePassword() {
@@ -149,10 +91,7 @@ bool Auth::changePassword() {
             cout << "请输入要修改密码的用户ID：";
             cin >> id;
             cout << endl;
-            if (id == "0") {
-                cout << "已退出修改密码📃！" << endl;
-                return false;
-            }
+            if (id == "0") return false;
             it = users.find(id);
             if (it == users.end()) {
                 cout << "❌该用户不存在" << endl;
@@ -165,10 +104,7 @@ bool Auth::changePassword() {
             cout << "请输入您的新密码：(不少于六位)";
             cin >> gnewPwd;
             cout << endl;
-            if (gnewPwd == "0") {
-                cout << "已退出修改密码📃！" << endl;
-                return false;
-            }
+            if (gnewPwd == "0") return false;
             if (gnewPwd.length() < 6) {
                 cout << "❌ 密码至少为六位!" << endl;
                 continue;
@@ -207,10 +143,7 @@ bool Auth::changePassword() {
             cout << endl;
             curr++;
             
-            if (oldPassword == "0") {
-                cout << "已退出修改密码📃！" << endl;
-                return false;
-            }
+            if (oldPassword == "0") return false;
             if (it->second.password != oldPassword) {
                 cout << "❌密码错误" << endl;
                 continue;
@@ -222,10 +155,7 @@ bool Auth::changePassword() {
             cout << "请输入您的新密码：(不少于六位)";
             cin >> newPwd;
             cout << endl;
-            if (newPwd == "0") {
-                cout << "已退出修改密码📃！" << endl;
-                return false;
-            }
+            if (newPwd == "0") return false;
             if (newPwd.length() < 6) {
                 cout << "❌ 密码至少为六位!" << endl;
                 continue;
@@ -255,10 +185,7 @@ bool Auth::deleteUser() {
         cout << "请输入您要删除的用户ID：";
         cin >> id;
         cout << endl;
-        if (id == "0") {
-            cout << "已退出删除页面！" << endl;
-            return false;
-        }
+        if (id == "0") return false;
         if (users.find(id) == users.end()) {
             cout << "❌当前用户不存在" << endl;
             continue;
@@ -274,10 +201,7 @@ bool Auth::deleteUser() {
     cout << "输入0退出/输入其他数字继续删除" << endl;
     cin >> num;
     cout << endl;
-    if (num == 0) {
-        cout << "已退出删除页面！" << endl;
-        return false;
-    }
+    if (num == 0) return false;
     users.erase(id);
     cout << "✅成功删除用户" + id + "!" << endl;
     cout << "已退出删除页面！" << endl;
@@ -300,58 +224,4 @@ string Auth::getCurrentUserId() const {
         return "";
     }
     return currentUserId;
-}
-
-bool Auth::isFileExist(const std::string &filename) {
-    ifstream file(filename);
-    return file.is_open();
-}
-
-bool Auth::saveToFile(const std::string &filename) {
-    ofstream file(filename);
-    if (!file.is_open()) {
-        cerr << "错误：无法打开文件 " << filename << " 进行写入" << endl;
-        return false;
-    }
-    file << "# User Data File" << endl;
-    file << "# Format:userId,password,role" << endl;
-    file << "# Created: " << __DATE__ << " " << __TIME__ << endl;
-    file << "# Total users: " << users.size() << endl;
-    file << "# ===================================" << endl;
-    
-    for (const auto& pair : users) {
-        const User& user = pair.second;
-        file << user.userId << "," << user.password << "," << user.role << endl;
-    }
-    return true;
-}
-
-bool Auth::loadFromFile(const std::string &filename) {
-    ifstream file(filename);
-    if (!file.is_open()) {
-        cerr << "错误：无法打开文件 " << filename << " 进行读取" << endl;
-        return false;
-    }
-    users.clear();
-    string line;
-    int lineNum = 0;
-    
-    while (getline(file, line)) {
-        lineNum++;
-        if (line.empty() || line[0] == '#') {
-            continue;
-        }
-        stringstream ss(line);
-        User user;
-        if (getline(ss, user.userId, ',') && getline(ss, user.password, ',') && getline(ss, user.role, ',')) {
-            if (!user.userId.empty() && !user.password.empty() && (user.role == "admin" || user.role == "student" || user.role == "teacher")) {
-                users[user.userId] = user;
-            } else {
-                cerr << "⚠️第" << lineNum << "行数据格式错误，已跳过" << endl;
-            }
-        } else {
-            cerr << "⚠️第" << lineNum << "行格式错误，已跳过" << endl;
-        }
-    }
-    return true;
 }

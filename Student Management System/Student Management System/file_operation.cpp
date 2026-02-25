@@ -21,7 +21,12 @@ string FileOperation::getError() {
     return lastError;
 }
 
-bool FileOperation::saveBinary(const StudentManage& manager, const std::string& filename) {
+bool FileOperation::saveBinary(const StudentManage& manager) {
+    cout << "===========二进制文件保存============";
+    cout << "请输入文件名：" << endl;
+    string filename;
+    cin >> filename;
+    cout << endl;
     ofstream file(filename, ios::binary);
     if (!file.is_open()) {
         setError("无法打开文件" + filename);
@@ -41,15 +46,14 @@ bool FileOperation::saveBinary(const StudentManage& manager, const std::string& 
     StudentNode* curr = manager.getHead();
     while (curr) {
         const Information& info = curr->data;
-        // 创建别名，引用，同一个地址
         int id = info.getId();
         string name = info.getName();
         string className = info.getClassName();
         file.write(reinterpret_cast<const char*>(&id), sizeof(id));
+        
         size_t nameLen = name.length();
         file.write(reinterpret_cast<const char*>(&nameLen), sizeof(nameLen));
         file.write(name.c_str(), nameLen);
-        
         size_t classLen = className.length();
         file.write(reinterpret_cast<const char*>(&classLen), sizeof(classLen));
         file.write(className.c_str(), classLen);
@@ -74,10 +78,16 @@ bool FileOperation::saveBinary(const StudentManage& manager, const std::string& 
         curr = curr->next;
     }
     file.close();
+    cout << "保存成功" << endl;
     return true;
 }
 
-bool FileOperation::saveText(const StudentManage &manager, const std::string &filename) {
+bool FileOperation::saveText(const StudentManage &manager) {
+    cout << "===========文本文件保存============";
+    cout << "请输入文件名：" << endl;
+    string filename;
+    cin >> filename;
+    cout << endl;
     ofstream file(filename);
     if (!file.is_open()) {
         setError("无法打开文本文件进行保存:" + filename);
@@ -101,30 +111,25 @@ bool FileOperation::saveText(const StudentManage &manager, const std::string &fi
         curr = curr->next;
     }
     file.close();
+    cout << "保存成功" << endl;
     return true;
 }
 
-bool FileOperation::loadBinary(StudentManage &manager, const std::string &filename) {
+bool FileOperation::loadBinary(StudentManage &manager) {
+    cout << "===========二进制文件加载============";
+    cout << "请输入文件名：" << endl;
+    string filename;
+    cin >> filename;
+    cout << endl;
     ifstream file(filename, ios::binary);
     if (!file.is_open()) {
         setError("无法打开文件进行读取：" + filename);
         return false;
     }
-    
     FileHeader header;
     file.read(reinterpret_cast<char*>(&header), sizeof(header));
-    if (!file) {
-        setError("读取文件头出错");
-        file.close();
-        return false;
-    }
     if (memcmp(header.magic, BINARY_MAGIC, 4) != 0) {
         setError("文件格式错误：不是有效二进制文件");
-        file.close();
-        return false;
-    }
-    if (header.version != 1) {
-        setError("不支持的文件版本：" + to_string(header.version));
         file.close();
         return false;
     }
@@ -132,69 +137,24 @@ bool FileOperation::loadBinary(StudentManage &manager, const std::string &filena
     for (int i = 0; i < header.studentCount; i++) {
         int id;
         file.read(reinterpret_cast<char*>(&id), sizeof(id));
-        if (!file) {
-            setError("读取学生ID出错");
-            file.close();
-            return false;
-        }
         size_t nameLen;
         file.read(reinterpret_cast<char*>(&nameLen), sizeof(nameLen));
-        if (!file) {
-            setError("读取学生姓名长度出错");
-            file.close();
-            return false;
-        }
         string name(nameLen, ' ');
         file.read(&name[0], nameLen);
-        if (!file) {
-            setError("读取学生姓名出错");
-            file.close();
-            return false;
-        }
         size_t classLen;
         file.read(reinterpret_cast<char*>(&classLen), sizeof(classLen));
-        if (!file) {
-            setError("读取学生班级名称长度出错");
-            file.close();
-            return false;
-        }
         string className(classLen, ' ');
         file.read(&className[0], classLen);
-        if (!file) {
-            setError("读取学生班级名称出错");
-            file.close();
-            return false;
-        }
         Information info(id, name, className);
         int subjectCount;
         file.read(reinterpret_cast<char*>(&subjectCount), sizeof(subjectCount));
-        if (!file) {
-            setError("读取学生科目数目出错");
-            file.close();
-            return false;
-        }
         for (int j = 0; j < subjectCount; j++) {
             size_t subNameLen;
             file.read(reinterpret_cast<char*>(&subNameLen), sizeof(subNameLen));
-            if (!file) {
-                setError("读取学生科目名称长度出错");
-                file.close();
-                return false;
-            }
             string subjectName(subNameLen, ' ');
             file.read(&subjectName[0], subNameLen);
-            if (!file) {
-                setError("读取学生科目名称出错");
-                file.close();
-                return false;
-            }
             int score;
             file.read(reinterpret_cast<char*>(&score), sizeof(score));
-            if (!file) {
-                setError("读取学生成绩出错");
-                file.close();
-                return false;
-            }
             if (!info.addSubject(subjectName, score)) {
                 setError("添加科目失败：" + subjectName);
                 file.close();
@@ -210,13 +170,17 @@ bool FileOperation::loadBinary(StudentManage &manager, const std::string &filena
         
     }
     file.close();
+    cout << "导入成功" << endl;
     return true;
 }
-
-
     
-    
-bool FileOperation::loadText(StudentManage &manager, const std::string &filename) {
+bool FileOperation::loadText(StudentManage &manager) {
+    cout << "===========文本文件加载============";
+    cout << "支持文件格式：学生ID,姓名,班级,科目:成绩,科目:成绩...." << endl;
+    cout << "请输入文件名：" << endl;
+    string filename;
+    cin >> filename;
+    cout << endl;
     ifstream file(filename);
     if (!file.is_open()) {
         setError("无法打开文本文件：" + filename);
@@ -284,67 +248,7 @@ bool FileOperation::loadText(StudentManage &manager, const std::string &filename
         }
     }
     file.close();
+    cout << "导入成功" << endl;
     return true;
 }
 
-bool FileOperation::save(const StudentManage &manager, const std::string &filename, Format format) {
-    if (filename.empty()) {
-        setError("文件名不能为空");
-        return false;
-    }
-    if (manager.getSize() == 0) {
-        setError("没有学生数据可以保存");
-        return false;
-    }
-    switch (format) {
-        case BINARY:
-            return saveBinary(manager, filename);
-        case TEXT:
-            return saveText(manager, filename);
-        default:
-            setError("不支持的格式类型");
-            return false;
-    }
-}
-
-bool FileOperation::load(StudentManage &manager, const std::string &filename) {
-    if (filename.empty()) {
-        setError("文件名不能为空");
-        return false;
-    }
-    Format detectedFormat = detectFormat(filename);
-    
-    switch (detectedFormat) {
-        case BINARY:
-            return loadBinary(manager, filename);
-        case TEXT:
-            return loadText(manager, filename);
-        default:
-            setError("无法识别文件格式：" + filename);
-            return false;
-    }
-}
-
-FileOperation::Format FileOperation::detectFormat(const std::string &filename) {
-    ifstream file(filename, ios::binary);
-    if (!file.is_open()) {
-        return UNKNOWN;
-    }
-    
-    file.seekg(0, ios::end);
-    streampos fileSize = file.tellg();
-    file.seekg(0, ios::beg);
-    if (fileSize < 4) {
-        file.close();
-        return TEXT;
-    }
-    
-    char magic[4];
-    file.read(magic, 4);
-    file.close();
-    
-    if (file.gcount() == 4 && memcmp(magic, BINARY_MAGIC, 4) == 0) {
-        return BINARY;
-    }
-    return TEXT;
-}

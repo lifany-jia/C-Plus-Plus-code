@@ -9,6 +9,7 @@
 
 #include "information.h"
 #include <string>
+#include <vector>
 
 class StudentNode {
 public:
@@ -17,6 +18,17 @@ public:
     StudentNode* next;
     
     StudentNode(const Information& info);
+};
+struct Appeal {
+    int id;
+    std::string name;
+    std::string type;
+    std::string appeal;
+    std::string reply;
+    time_t createTime;
+    Appeal(int id, std::string name, std::string type)
+        :id(id), name(name), type(type) {
+    }
 };
 class StudentManage {
 private:
@@ -27,35 +39,24 @@ private:
     StudentNode* findNodeById(int id) const;
     void swapNode(StudentNode* a, StudentNode* b);
 public:
+    std::vector<Appeal> appeals;
     StudentManage();
     ~StudentManage();
     
-    int getSize()const;
     bool isEmpty()const;
     void clear();
-    
-    bool addStudent(const Information& info);
-    bool removeStudentById(int id);
-    
-    Information* getStudentById(int id);
-    const Information* getStudentById(int id) const;
-    
-    bool addSubjectToStudent(int id, const std::string& subjectName, int score);
-    bool updateStudentSubjectScore(int id, const std::string& subjectName, int score);
-    bool removeStudentSubjectScore(int id, const std::string& subjectName);
-    
-    void sortByTotalScore(bool ascending = true);
-    void sortByAverageScore(bool ascending = true);
-    void sortBySubjectScore(const std::string& subjectName, bool ascending = true);
-    
-    bool getStudentRank(int studentId, int& myRank) const;  // 总分排名
-    bool getStudentRank(int studentId, const std::string& subjectName, int& myRank) const;
-    void showClassRank();
-    
-    int getTotalPages(int pageSize) const;
-    StudentNode* getPageStart(int pageIndex, int pageSize) const;
-    
+    int getSize()const;
     StudentNode* getHead() const;
     StudentNode* getTail() const;
+    
+    bool addStudent(const Information& info);
+    bool removeStudentById(int id);      //  学生操作
+    Information* getStudentById(int id);
+    const Information* getStudentById(int id) const;  // 获取学生
+    void sortByTotalScore(bool ascending = true);
+    void sortByAverageScore(bool ascending = true);
+    void sortBySubjectScore(const std::string& subjectName, bool ascending = true);   // 排序
+    bool getStudentRank(int studentId, int& myRank) const;
+    bool getStudentRank(int studentId, const std::string& subjectName, int& myRank) const;     // 排名
 };
 #endif

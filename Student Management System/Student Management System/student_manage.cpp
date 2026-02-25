@@ -40,10 +40,7 @@ void StudentManage::swapNode(StudentNode *a, StudentNode *b) {
     // 默认构造函数起作用
     a->data = b->data;
     b->data = temp;
-    //只交换数据
 }
-
-//基础操作
 int StudentManage::getSize() const {
     return size;
 }
@@ -60,13 +57,10 @@ void StudentManage::clear() {
     head = tail = nullptr;
     size = 0;
 }
-
-//学生信息
 bool StudentManage::addStudent(const Information &info) {
     if (findNodeById(info.getId())) {
         return false;
     }
-    // 检查ID唯一性（利用封装：Information提供getId()）
     StudentNode* newnode = new StudentNode(info);
     //StudentNode没有默认构造函数，因为没有意义，只是一个节点，如果没内容反而麻烦
     // 参数info是const引用，避免拷贝传入
@@ -107,23 +101,6 @@ const Information* StudentManage::getStudentById(int id) const
 {
     const StudentNode* node = findNodeById(id);
     return node ? &(node->data) : nullptr;
-}
-
-//成绩信息修改
-bool StudentManage::addSubjectToStudent(int id, const std::string &subjectName, int score) {
-    StudentNode* node = findNodeById(id);
-    if (node) {
-        return node->data.addSubject(subjectName, score);
-    }
-    return false;
-}
-bool StudentManage::updateStudentSubjectScore(int id, const std::string &subjectName, int score) {
-    StudentNode* student = findNodeById(id);
-    return student ? student->data.updateSubjectScore(subjectName, score) : false;
-}
-bool StudentManage::removeStudentSubjectScore(int id, const std::string &subjectName) {
-    StudentNode* node = findNodeById(id);
-    return node ? node->data.removeSubject(subjectName) : false;
 }
 
 // 排序
@@ -176,11 +153,8 @@ void StudentManage::sortBySubjectScore(const std::string &subjectName, bool asce
         swapped = false;
         StudentNode* curr = head;
         while (curr && curr->next) {
-            int a, b;
-            bool hasa = curr->data.getSubjectScore(subjectName, a);
-            bool hasb = curr->next->data.getSubjectScore(subjectName, b);
-            if (!hasa) a = -1;
-            if (!hasb) b = -1;
+            int a = curr->data.getSubjectScore(subjectName);
+            int b = curr->next->data.getSubjectScore(subjectName);
             bool shouldSwap = false;
             if (ascending) {
                 // 升序，无科目排最后
@@ -195,29 +169,6 @@ void StudentManage::sortBySubjectScore(const std::string &subjectName, bool asce
             curr = curr->next;
         }
     }while (swapped);
-}
-
-int StudentManage::getTotalPages(int pageSize) const {
-    if (pageSize <= 0) return 0;
-    return (size + pageSize - 1) / pageSize;
-    // 向上取整
-}
-StudentNode* StudentManage::getPageStart(int pageIndex, int pageSize) const {
-    if (pageIndex < 1 || pageSize <= 0) {
-        return nullptr;
-    }
-    int startPos = (pageIndex - 1) * pageSize;
-    // 例子：找第2页，每页3个
-    // startPos = (2-1) * 3 = 3
-    // 意思：跳过前3个学生，从第4个开始（因为从0开始数）
-    if (startPos >= size) {
-        return nullptr;
-    }
-    StudentNode* curr = head;
-    for (int i = 0; i < startPos && curr; i++) {
-        curr = curr->next;
-    }
-    return curr;
 }
 
 StudentNode* StudentManage::getHead() const {
@@ -256,8 +207,8 @@ bool StudentManage::getStudentRank(int studentId, const std::string &subjectName
     std::vector<std::pair<int, int>> classScores;
     StudentNode* curr = getHead();
     while (curr) {
-        int score;
-        if (curr->data.getSubjectScore(subjectName, score)) {
+        int score = curr->data.getSubjectScore(subjectName);
+        if (score != -1) {
             classScores.push_back({curr->data.getId(), score});
         }
         curr = curr->next;

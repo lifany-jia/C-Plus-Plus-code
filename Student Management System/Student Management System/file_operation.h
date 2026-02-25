@@ -19,22 +19,16 @@ private:
         int version;
         int studentCount;
     };
-    static bool saveBinary(const StudentManage& manager, const std::string& filename);
-    static bool loadBinary(StudentManage& manager, const std::string& filename);
+public:
+    static bool saveBinary(const StudentManage& manager);
+    static bool loadBinary(StudentManage& manager);
     
-    static bool saveText(const StudentManage& manager, const std::string& filename);
-    static bool loadText(StudentManage& manager, const std::string& filename);
+    static bool saveText(const StudentManage& manager);
+    static bool loadText(StudentManage& manager);
     
     static std::string lastError;
     static void setError(const std::string& error);
-public:
-    enum Format {
-        BINARY, TEXT, UNKNOWN
-    };
-    static bool save(const StudentManage& manager, const std::string& filename, Format format = BINARY);
-    static bool load(StudentManage& manager, const std::string& filename);
     static std::string getError();
-    static Format detectFormat(const std::string& filename);
 };
 
 #endif

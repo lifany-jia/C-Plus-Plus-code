@@ -21,21 +21,17 @@ private:
     bool isLoggedIn;
     
     bool login();
-    void showMainMenu();//菜单
-    void queryMenu();
-    void analysisMenu();
-    
-    void queryMyScores(); //功能
-    void queryClassScores();
-    void showClassRanking();
-    void showScoreBarChart(const std::vector<int>& scores, const std::string& title);
-    
-    Information* getCurrentStudent(); // 辅助
-    std::vector<Information> getClassStudents();
-    void printStudentInfo(const Information& Student);
+    void showMainMenu();
+    void analysisMenu();  //菜单
+    void queryMyScores();
+    void queryClassScores();  // 查询
+    void showClassRanking();   // 排名
+    void addAppeal();
+    void showScoreBarChart(const std::vector<int>& scores, const std::string& title);  // 条状图
+    Information* getCurrentStudent();
+    std::vector<Information> getClassStudents();  // 辅助函数
     void waitForEnter();
     void clearScreen();
-    
 public:
     StudentUI(StudentManage*mgr, Auth* auth);
     void run();
