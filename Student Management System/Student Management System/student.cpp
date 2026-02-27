@@ -470,8 +470,7 @@ bool StudentUI::login() {
                 }
             }
         } else if (num == 2) {
-            cout << "已退出登录" << endl;
-            waitForEnter();
+            cout << "已退出登录!" << endl;
             return false;
         } else {
             cout << "❌ 请输入正确指令！" << endl;

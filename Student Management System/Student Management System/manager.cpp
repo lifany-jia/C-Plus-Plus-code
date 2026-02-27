@@ -41,47 +41,37 @@ void ManagerUI::mainMenu() {
         cout << "请选择：" ;
         cin >> choice;
         cout << endl;
-        switch (choice) {
-            case 1:
-                while (true) {
-                    TeacherUI::clearScreen();
-                    cout << "===============学生管理============" << endl;
-                    cout << "1. 学生信息管理" << endl;
-                    cout << "2. 用户账户管理" << endl;
-                    int num;
-                    cout << "请选择：" ;
-                    cin >> num;
-                    cout << endl;
-                    switch (num) {
-                        case 1:
-                            TeacherUI::studentManageMenu(mgr);
-                        break;
-                        case 2:
-                            authManager();
-                            break;
-                        default: break;
-                    }
-                }
-                break;
-            case 2:
-                loginAsTeacher();
-                break;
-            case 3:
-                viewTasks();
-                break;
-            case 4:
-                fileMenu();
-                break;
-            case 5:
-                isLoggedIn = false;
-                auth->logout();
-                cout << "已退出登录" << endl;
-                TeacherUI::waitForEnter();
-                return;
-            default:
-                cout << "❌ 无效选择" << endl;
-                TeacherUI::waitForEnter();
-                break;
+        if (choice == 1){
+            while (true) {
+                TeacherUI::clearScreen();
+                cout << "===============学生管理============" << endl;
+                cout << "1. 学生信息管理" << endl;
+                cout << "2. 用户账户管理" << endl;
+                cout << "3. 返回上一级" << endl;
+                int num;
+                cout << "请选择：" ;
+                cin >> num;
+                cout << endl;
+                if (num == 1) {
+                    TeacherUI::studentManageMenu(mgr);
+                } else if (num == 2) {
+                    authManager();
+                } else break;
+            }
+        } else if (choice == 2) {
+            loginAsTeacher();
+        } else if (choice == 3) {
+            viewTasks();
+        } else if (choice == 4) {
+            fileMenu();
+        } else if (choice == 5) {
+            isLoggedIn = false;
+            auth->logout();
+            cout << "已退出登录" << endl;
+            TeacherUI::waitForEnter();
+        } else {
+            cout << "❌ 无效选择" << endl;
+            TeacherUI::waitForEnter();
         }
     }
 }
@@ -102,7 +92,7 @@ void ManagerUI::viewTasks() {
             TeacherUI::waitForEnter();
             return;
         }
-        cout << "⚠️当前有" << count << "条待办！！" << endl;
+        cout << "\n⚠️当前有" << count << "条待办！！" << endl;
         cout << "-------------------------------" << endl;
         cout << "1. 处理结束回复" << endl;
         cout << "2. 返回上一级" << endl;
@@ -146,7 +136,7 @@ void ManagerUI::authManager() {
         switch (choice) {
             case 1: {
                 while (true) {
-                    TeacherUI::waitForEnter();
+                    TeacherUI::clearScreen();
                     cout << "请输入账户ID(输入0退出）：" ;
                     cin >> id;
                     if (id == "0") break;
@@ -195,8 +185,8 @@ void ManagerUI::fileMenu() {
         cout << "=============文件操作=============" << endl;
         cout << "1. 批量导入学生信息" << endl;
         cout << "2. 批量导入教师信息" << endl;
-        cout << "5. 导出用户账户信息" << endl;
-        cout << "6. 返回上一级" << endl;
+        cout << "3. 导出用户账户信息" << endl;
+        cout << "4. 返回上一级" << endl;
         cout << "===============================" << endl;
         cout << "请选择：" << endl;
         int choice;
@@ -213,6 +203,7 @@ void ManagerUI::fileMenu() {
             case 3:
                 exportUsers();
                 break;
+            case 4: return;
             default:
                 cout << "❌ 无效选择" << endl;
                 TeacherUI::waitForEnter();
@@ -397,4 +388,16 @@ bool ManagerUI::login() {
         }
     }
     return false;
+}
+void ManagerUI::run() {
+    while (true) {
+        if (!isLoggedIn) {
+            bool loginSuccess = login();
+            if (!loginSuccess) {
+                break;
+            }
+        } else {
+            mainMenu();
+        }
+    }
 }

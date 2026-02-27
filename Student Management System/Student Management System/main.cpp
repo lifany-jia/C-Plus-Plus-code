@@ -13,18 +13,18 @@
 using namespace std;
 
 int main() {
-    TeacherUI::clearScreen();
-    cout << "=========================" << endl;
-    cout << "       学生管理系统" << endl;
-    cout << "=========================" << endl;
     Auth auth;
     StudentManage manager;
     while (true) {
+        TeacherUI::clearScreen();
+        cout << "=========================" << endl;
+        cout << "       学生管理系统" << endl;
+        cout << "=========================" << endl;
         cout << "1. 学生" << endl;
         cout << "2. 教师" << endl;
         cout << "3. 管理员" << endl;
         cout << "4. 退出系统" << endl;
-        cout << "-----------------------------" << endl;
+        cout << "---------------------------" << endl;
         cout << "请选择：" << endl;
         int choice;
         cin >> choice;

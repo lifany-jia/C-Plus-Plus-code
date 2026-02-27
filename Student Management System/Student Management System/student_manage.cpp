@@ -188,10 +188,9 @@ bool StudentManage::getStudentRank(int studentId, int& myRank) const {
         curr = curr->next;
     }
     std::sort(classTotalScore.begin(), classTotalScore.end(),
-              [](const auto& a, const auto& b) {
+              [](const std::pair<int, int>& a, const std::pair<int, int>& b) {
         return a.second > b.second;
     });
-    bool found = false;
     for (int i = 0; i < classTotalScore.size(); i++) {
         if (classTotalScore[i].first == studentId) {
             myRank = i + 1;
@@ -214,10 +213,9 @@ bool StudentManage::getStudentRank(int studentId, const std::string &subjectName
         curr = curr->next;
     }
     std::sort(classScores.begin(), classScores.end(),
-              [](const auto& a, const auto& b) {
+              [](const std::pair<int, int>& a, const std::pair<int, int>& b) {
         return a.second > b.second;
     });
-    bool found = false;
     for (int i = 0; i < classScores.size(); i++) {
         if (classScores[i].first == studentId) {
             myRank = i + 1;

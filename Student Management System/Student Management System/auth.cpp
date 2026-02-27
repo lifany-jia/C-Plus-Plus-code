@@ -5,6 +5,7 @@
 //  Created by lifany on 2026/2/15.
 //
 #include "auth.h"
+#include "teacher.h"
 #include <fstream>
 #include <iostream>
 #include <sstream>
@@ -18,6 +19,7 @@ Auth::Auth()
 }
 
 bool Auth::login() {
+    TeacherUI::clearScreen();
     cout << "==========登录==========" << endl;
     cout << "(输入0退出登录)" << endl;
     string userId;
@@ -77,10 +79,6 @@ bool Auth::addUser(const User &user) {
 }
 
 bool Auth::changePassword() {
-    if (!isLoggedIn) {
-        cout << "❌ 请先登录！" << endl;
-        return false;
-    }
     cout << "==========修改密码==========" << endl;
     cout << "(输入0退出修改密码📃)" << endl;
     auto it = users.end();
@@ -197,16 +195,8 @@ bool Auth::deleteUser() {
             cout << "请重新输入其他用户ID。" << endl;
             continue;
         }
-        break;
+        cout << "✅成功删除用户" + id + "!" << endl;
     }
-    int num;
-    cout << "输入0退出/输入其他数字继续删除" << endl;
-    cin >> num;
-    cout << endl;
-    if (num == 0) return false;
-    users.erase(id);
-    cout << "✅成功删除用户" + id + "!" << endl;
-    cout << "已退出删除页面！" << endl;
     return true;
 }
 

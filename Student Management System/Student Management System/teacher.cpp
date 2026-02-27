@@ -157,11 +157,12 @@ void TeacherUI::studentManageMenu(StudentManage* manager) {
     while (true) {
         clearScreen();
         cout << "============学生信息管理===========" << endl;
-        cout << "1. 增添学生信息" << endl;
+        cout << "1. 增添学生成绩信息" << endl;
         cout << "2. 删除学生信息" << endl;
         cout << "3. 修改学生信息" << endl;
         cout << "4. 查看学生信息" << endl;
         cout << "5. 返回上一级" << endl;
+        if (!isAdminMode) cout << "🔔 如需添加学生账户请联系管理员" << endl;
         cout << "---------------------------------" << endl;
         cout << "请选择：" ;
         int choice;
@@ -169,7 +170,7 @@ void TeacherUI::studentManageMenu(StudentManage* manager) {
         cout << endl;
         switch (choice) {
             case 1:
-                TeacherUI::addStudent(manager);
+                TeacherUI::addStudentSubject(manager);
                 break;
             case 2:
                 while (true) {
@@ -210,45 +211,31 @@ void TeacherUI::studentManageMenu(StudentManage* manager) {
     }
 }
 
-void TeacherUI::addStudent(StudentManage* manager) {
+void TeacherUI::addStudentSubject(StudentManage* manager) {
     while (true) {
         clearScreen();
-        cout << "==============添加学生===========" << endl;
-        cout << "请输入学生姓名(输入0退出）：" ;
-        string name, className;
+        cout << "==============学生成绩添加============" << endl;
+        cout << "请输入学生ID(输入0退出）：" ;
         int id;
-        cin >> name;
-        if (name == "0") return;
-        cout << "\n请输入学生学号：" ;
         cin >> id;
-        cout << "\n请输入学生班级：" ;
-        cin >> className;
-        Information newStudent(id, name, className);
-        cout << "\n是否添加成绩（y/n）：" ;
-        char ch;
-        cin >> ch;
-        cout << endl;
-        if (ch == 'y' || ch == 'Y') {
-            string subName;
-            int score;
-            while (true) {
-                cout << "请输入科目名称（输入0退出）：" ;
-                cin >> subName;
-                if (subName == "0") break;
-                cout << "\n请输入学生成绩：" ;
-                cin >> score;
-                cout << endl;
-                newStudent.addSubject(subName, score);
-                cout << subName << "成绩添加成功！" << endl;
-            }
+        Information* curr = manager->getStudentById(id);
+        if (!curr) {
+            cout << "\n当前学生不存在！" << endl;
             waitForEnter();
-            return ;
-        } else {
-            if (manager->addStudent(newStudent)) {
-                cout << name << "添加成功！" << endl;
-            } else cout << name << "添加成功！" << endl;
+            continue;
         }
-        waitForEnter();
+        string subName;
+        int score;
+        while (true) {
+            cout << "\n请输入科目名称（输入0退出）：" ;
+            cin >> subName;
+            if (subName == "0") break;
+            cout << "\n请输入学生成绩：" ;
+            cin >> score;
+            cout << endl;
+            curr->addSubject(subName, score);
+            cout << subName << "成绩添加成功！" << endl;
+        }
         return ;
     }
 }
@@ -267,12 +254,14 @@ void TeacherUI::modifyStudent(StudentManage* manager) {
         cout << "请选择：";
         int choice;
         cin >> choice;
+        if (choice == 6) return;
         cout << "\n请输入修改的学生的ID：";
         int id;
         cin >> id;
         Information* stu = manager->getStudentById(id);
         if (!stu) {
             cout << "该学生不存在！" << endl;
+            waitForEnter();
             continue;
         }
         string subName, className, name;
@@ -408,7 +397,7 @@ void TeacherUI::addAppeal() {
         cout << endl;
         if (choice == 1) {
             Appeal appeal(currentTeacherId, currentTeacherName, "账号密码修改");
-            cout << "请写出你的诉求，新密码:" << endl;
+            cout << "请写出你的诉求，账户ID，新密码:" << endl;
             cin >> appeal.appeal;
             manager->appeals.push_back(appeal);
             waitForEnter();

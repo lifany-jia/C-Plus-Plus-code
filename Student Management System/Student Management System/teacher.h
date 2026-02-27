@@ -20,7 +20,6 @@ private:
     std::string currentTeacherName;
     std::string currentClass;
     bool isLoggedIn;
-    bool isAdminMode;
     
     bool login();
     void showMainMenu();// 菜单
@@ -28,8 +27,9 @@ private:
     void addAppeal();
     std::vector<Information> getMyClassStudents() const;
 public:
+    static bool isAdminMode;
     static void studentManageMenu(StudentManage* manager);
-    static void addStudent(StudentManage* manager);
+    static void addStudentSubject(StudentManage* manager);
     static void modifyStudent(StudentManage* manager);
     static void printStudentDetail(StudentManage* manager, const Information& stu);
     static std::string getRankString(int studentId, StudentManage* manager) ;

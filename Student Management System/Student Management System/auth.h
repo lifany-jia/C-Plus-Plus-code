@@ -17,9 +17,9 @@ struct User {
     std::string className;
     std::string realName;
     
+    User() {}
     User(std::string userId, std::string password, std::string role, std::string className, std::string realName)
-        :userId(userId), password(password), role(role), className(className), realName(realName){
-    }
+        :userId(userId), password(password), role(role), className(className), realName(realName){}
 };
 class Auth {
 private:
