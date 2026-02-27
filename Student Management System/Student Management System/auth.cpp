@@ -13,6 +13,8 @@ using namespace std;
 
 Auth::Auth()
     :isLoggedIn(false) {
+        User admin("00001", "admin123", "admin", "", "系统管理员");
+        users["00001"] = admin;
 }
 
 bool Auth::login() {

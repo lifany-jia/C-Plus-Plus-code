@@ -96,7 +96,7 @@ void TeacherUI::showMainMenu() {
                 listClassStudents();
                 break;
             case 3:
-                
+                printf("没写");
                 break;
             case 4:
                 cout << "1. 保存为文本文件" << endl;
