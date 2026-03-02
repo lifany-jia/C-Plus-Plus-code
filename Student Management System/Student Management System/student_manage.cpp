@@ -8,6 +8,7 @@
 #include <utility>
 #include <vector>
 #include <algorithm>
+#include <iostream>
 
 StudentNode::StudentNode(const Information& info)
     :data(info), prev(nullptr), next(nullptr) {
@@ -21,16 +22,20 @@ StudentManage::~StudentManage() {
 }
 
 // 内部函数工具
-StudentNode* StudentManage::findNodeById(int id) const{
+StudentNode* StudentManage::findNodeById(std::string id) const{
     StudentNode* curr = head;
     while (curr) {
         if (curr->data.getId() == id) {
-            //information封装，只能使用它提供的接口，不能直接访问具体private数据
             return curr;
         }
         curr = curr->next;
     }
     return nullptr;
+}
+
+Information* StudentManage::getStudentById(std::string id) {
+    StudentNode* node = findNodeById(id);
+    return node ? &(node->data) : nullptr;
 }
 void StudentManage::swapNode(StudentNode *a, StudentNode *b) {
     if (!a || !b || a == b) {
@@ -74,7 +79,7 @@ bool StudentManage::addStudent(const Information &info) {
     size++;
     return true;
 }
-bool StudentManage::removeStudentById(int id) {
+bool StudentManage::removeStudentById(std::string id) {
     StudentNode* node = findNodeById(id);
     if (!node) {
         return false;
@@ -93,11 +98,7 @@ bool StudentManage::removeStudentById(int id) {
     size--;
     return true;
 }
-Information* StudentManage::getStudentById(int id) {
-    StudentNode* node = findNodeById(id);
-    return node ? &(node->data) : nullptr;
-}
-const Information* StudentManage::getStudentById(int id) const
+const Information* StudentManage::getStudentById(std::string id) const
 {
     const StudentNode* node = findNodeById(id);
     return node ? &(node->data) : nullptr;
@@ -178,17 +179,17 @@ StudentNode* StudentManage::getTail() const {
     return tail;
 }
 
-bool StudentManage::getStudentRank(int studentId, int& myRank) const {
+bool StudentManage::getStudentRank(std::string studentId, int& myRank) const {
     const Information* currStudent = getStudentById(studentId);
     if (!currStudent) return false;
-    std::vector<std::pair<int, int>> classTotalScore;
+    std::vector<std::pair<std::string, int>> classTotalScore;
     StudentNode* curr = getHead();
     while (curr) {
         classTotalScore.push_back({curr->data.getId(), curr->data.getTotalScore()});
         curr = curr->next;
     }
     std::sort(classTotalScore.begin(), classTotalScore.end(),
-              [](const std::pair<int, int>& a, const std::pair<int, int>& b) {
+              [](const std::pair<std::string, int>& a, const std::pair<std::string, int>& b) {
         return a.second > b.second;
     });
     for (int i = 0; i < classTotalScore.size(); i++) {
@@ -200,10 +201,10 @@ bool StudentManage::getStudentRank(int studentId, int& myRank) const {
     return false;
 }
 
-bool StudentManage::getStudentRank(int studentId, const std::string &subjectName, int& myRank) const {
+bool StudentManage::getStudentRank(std::string studentId, const std::string &subjectName, int& myRank) const {
     const Information* currStudent = getStudentById(studentId);
     if (!currStudent) return false;
-    std::vector<std::pair<int, int>> classScores;
+    std::vector<std::pair<std::string, int>> classScores;
     StudentNode* curr = getHead();
     while (curr) {
         int score = curr->data.getSubjectScore(subjectName);
@@ -213,7 +214,7 @@ bool StudentManage::getStudentRank(int studentId, const std::string &subjectName
         curr = curr->next;
     }
     std::sort(classScores.begin(), classScores.end(),
-              [](const std::pair<int, int>& a, const std::pair<int, int>& b) {
+              [](const std::pair<std::string, int>& a, const std::pair<std::string, int>& b) {
         return a.second > b.second;
     });
     for (int i = 0; i < classScores.size(); i++) {

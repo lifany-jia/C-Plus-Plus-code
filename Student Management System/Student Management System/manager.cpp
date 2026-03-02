@@ -101,7 +101,7 @@ void ManagerUI::viewTasks() {
         cin >> choice;
         cout << endl;
         if (choice == 1) {
-            int id;
+            string id;
             cout << "请输入你的回复账户ID：";
             cin >> id;
             for (auto& item : mgr->appeals) {
@@ -157,8 +157,12 @@ void ManagerUI::authManager() {
                     User newUser(id, "123456", role, className, name);
                     auth->addUser(newUser);
                     if (role == "student"){
-                        int idNum = stoi(id);
-                        Information newStu(idNum, name, className);
+                        Information newStu(id, name, className);
+                        if (mgr->addStudent(newStu)) {
+                                cout << "✅ 学生信息添加成功" << endl;
+                            } else {
+                                cout << "❌ 学生信息添加失败（可能ID已存在）" << endl;
+                            }
                     }
                     TeacherUI::waitForEnter();
                 }
@@ -169,6 +173,7 @@ void ManagerUI::authManager() {
                 break;
             case 3:
                 auth->changePassword();
+                TeacherUI::waitForEnter();
                 break;
             case 4: return;
             default:
@@ -234,13 +239,12 @@ void ManagerUI::importStudents() {
         lineNum++;
         if (line.empty()) continue;
         stringstream ss(line);
-        string idStr, name, className;
-        if (getline(ss, idStr, ',') && getline(ss, name, ',') && getline(ss, className, ',')) {
+        string id, name, className;
+        if (getline(ss, id, ',') && getline(ss, name, ',') && getline(ss, className, ',')) {
             try {
-                int id = stoi(idStr);
                 Information newStu(id, name, className);
                 if (mgr->addStudent(newStu)) {
-                    User newUser(idStr, "123456", "student", className, name);
+                    User newUser(id, "123456", "student", className, name);
                     auth->addUser(newUser);
                     success++;
                 } else failed++;

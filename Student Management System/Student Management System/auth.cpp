@@ -58,9 +58,14 @@ bool Auth::login() {
         }
         break;
     }
+    
+    
+    cout << "22";
+    
+    
     currentUserId = userId;
     isLoggedIn = true;
-    cout << "用户登录成功！欢迎👏" + userId << "!" << endl;
+    cout << "用户登录成功！欢迎👏" + users[getCurrentUserId()].realName << "!" << endl;
     cout << "当前角色🧍🏻‍♀️：" << it->second.role << endl;
     return true;
 }

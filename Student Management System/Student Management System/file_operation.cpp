@@ -12,24 +12,16 @@
 using namespace std;
 
 const char FileOperation::BINARY_MAGIC[4] = {'S', 'M', 'S', '1'};
-string FileOperation::lastError = "";
-
-void FileOperation::setError(const std::string& error) {
-    lastError = error;
-}
-string FileOperation::getError() {
-    return lastError;
-}
 
 bool FileOperation::saveBinary(const StudentManage& manager) {
-    cout << "===========二进制文件保存============";
+    cout << "===========二进制文件保存============" << endl;
     cout << "请输入文件名：" << endl;
     string filename;
     cin >> filename;
     cout << endl;
     ofstream file(filename, ios::binary);
     if (!file.is_open()) {
-        setError("无法打开文件" + filename);
+        cout << "无法打开文件" + filename;
         return false;
     }
     FileHeader header;
@@ -39,14 +31,14 @@ bool FileOperation::saveBinary(const StudentManage& manager) {
     
     file.write(reinterpret_cast<const char*>(&header), sizeof(header));
     if (!file) {
-        setError("写入文件头失败" + filename);
+        cout << "写入文件头失败" + filename;
         file.close();
         return false;
     }
     StudentNode* curr = manager.getHead();
     while (curr) {
         const Information& info = curr->data;
-        int id = info.getId();
+        string id = info.getId();
         string name = info.getName();
         string className = info.getClassName();
         file.write(reinterpret_cast<const char*>(&id), sizeof(id));
@@ -71,7 +63,7 @@ bool FileOperation::saveBinary(const StudentManage& manager) {
             sub = sub->next;
         }
         if (!file) {
-            setError("写入学生数据出错" + filename);
+            cout << "写入学生数据出错" + filename;
             file.close();
             return false;
         }
@@ -83,14 +75,14 @@ bool FileOperation::saveBinary(const StudentManage& manager) {
 }
 
 bool FileOperation::saveText(const StudentManage &manager) {
-    cout << "===========文本文件保存============";
+    cout << "===========文本文件保存============" << endl;
     cout << "请输入文件名：" << endl;
     string filename;
     cin >> filename;
     cout << endl;
     ofstream file(filename);
     if (!file.is_open()) {
-        setError("无法打开文本文件进行保存:" + filename);
+        cout << "无法打开文本文件进行保存:" + filename;
         return false;
     }
     file << "# Student Management System - Text " << endl;
@@ -116,26 +108,25 @@ bool FileOperation::saveText(const StudentManage &manager) {
 }
 
 bool FileOperation::loadBinary(StudentManage &manager) {
-    cout << "===========二进制文件加载============";
+    cout << "===========二进制文件加载============" << endl;
     cout << "请输入文件名：" << endl;
     string filename;
     cin >> filename;
     cout << endl;
     ifstream file(filename, ios::binary);
     if (!file.is_open()) {
-        setError("无法打开文件进行读取：" + filename);
+        cout << "无法打开文件进行读取：" + filename;
         return false;
     }
     FileHeader header;
     file.read(reinterpret_cast<char*>(&header), sizeof(header));
     if (memcmp(header.magic, BINARY_MAGIC, 4) != 0) {
-        setError("文件格式错误：不是有效二进制文件");
+        cout << "文件格式错误：不是有效二进制文件";
         file.close();
         return false;
     }
-    manager.clear();
     for (int i = 0; i < header.studentCount; i++) {
-        int id;
+        string id;
         file.read(reinterpret_cast<char*>(&id), sizeof(id));
         size_t nameLen;
         file.read(reinterpret_cast<char*>(&nameLen), sizeof(nameLen));
@@ -145,29 +136,29 @@ bool FileOperation::loadBinary(StudentManage &manager) {
         file.read(reinterpret_cast<char*>(&classLen), sizeof(classLen));
         string className(classLen, ' ');
         file.read(&className[0], classLen);
-        Information info(id, name, className);
-        int subjectCount;
-        file.read(reinterpret_cast<char*>(&subjectCount), sizeof(subjectCount));
-        for (int j = 0; j < subjectCount; j++) {
-            size_t subNameLen;
-            file.read(reinterpret_cast<char*>(&subNameLen), sizeof(subNameLen));
-            string subjectName(subNameLen, ' ');
-            file.read(&subjectName[0], subNameLen);
-            int score;
-            file.read(reinterpret_cast<char*>(&score), sizeof(score));
-            if (!info.addSubject(subjectName, score)) {
-                setError("添加科目失败：" + subjectName);
+        Information* info = manager.getStudentById(id);
+        if (info) {
+            int subjectCount;
+            file.read(reinterpret_cast<char*>(&subjectCount), sizeof(subjectCount));
+            for (int j = 0; j < subjectCount; j++) {
+                size_t subNameLen;
+                file.read(reinterpret_cast<char*>(&subNameLen), sizeof(subNameLen));
+                string subjectName(subNameLen, ' ');
+                file.read(&subjectName[0], subNameLen);
+                int score;
+                file.read(reinterpret_cast<char*>(&score), sizeof(score));
+                if (!info->addSubject(subjectName, score)) {
+                    cout << "添加科目失败：" + subjectName;
+                    file.close();
+                    return false;
+                }
+            }
+            if (!manager.addStudent(*info)) {
+                cout << "添加学生失败：" + name;
                 file.close();
                 return false;
             }
-        }
-        
-        if (!manager.addStudent(info)) {
-            setError("添加学生失败：" + name);
-            file.close();
-            return false;
-        }
-        
+        } else cout << name << " 不存在该学生！请联系管理员添加学生账户" << endl;
     }
     file.close();
     cout << "导入成功" << endl;
@@ -175,7 +166,7 @@ bool FileOperation::loadBinary(StudentManage &manager) {
 }
     
 bool FileOperation::loadText(StudentManage &manager) {
-    cout << "===========文本文件加载============";
+    cout << "===========文本文件加载============" << endl;
     cout << "支持文件格式：学生ID,姓名,班级,科目:成绩,科目:成绩...." << endl;
     cout << "请输入文件名：" << endl;
     string filename;
@@ -183,11 +174,9 @@ bool FileOperation::loadText(StudentManage &manager) {
     cout << endl;
     ifstream file(filename);
     if (!file.is_open()) {
-        setError("无法打开文本文件：" + filename);
+        cout << "无法打开文本文件：" + filename;
         return false;
     }
-    manager.clear();
-        
     string line;
     int lineNum = 0;
     while (getline(file, line)) {
@@ -196,7 +185,6 @@ bool FileOperation::loadText(StudentManage &manager) {
         if (line[0] == '#') continue;
         line.erase(0, line.find_first_not_of(" \t"));
         line.erase(line.find_last_not_of(" \t") + 1);
-        
         vector<string> tokens;
         size_t start = 0;
         size_t end = line.find(',');
@@ -206,43 +194,34 @@ bool FileOperation::loadText(StudentManage &manager) {
             end = line.find(',', start);
         }
         tokens.push_back(line.substr(start));
-        
         if (tokens.size() < 3) {
-            setError("第" + to_string(lineNum) + "行格式错误：数据字段不足");
+            cout << "第" + to_string(lineNum) + "行格式错误：数据字段不足";
             file.close();
             return false;
         }
         try {
-            int id = stoi(tokens[0]);
-            string name = tokens[1];
-            string className = tokens[2];
-            
-            Information info(id, name, className);
-            
-            for (size_t i = 3; i < tokens.size(); i++) {
-                string token = tokens[i];
-                token.erase(0, token.find_first_not_of(" \t"));
-                token.erase(token.find_last_not_of(" \t") + 1);
-                size_t colonPos = token.find(':');
-                if (colonPos != string::npos) {
-                    string subjectName = token.substr(0, colonPos);
-                    string scoreStr = token.substr(colonPos + 1);
-                    int score = stoi(scoreStr);
-                    
-                    if (!info.addSubject(subjectName, score)) {
-                        setError("第" + to_string(lineNum) + "行：添加科目失败-" + subjectName);
-                        file.close();
-                        return false;
+            string id = tokens[0];
+            Information* info = manager.getStudentById(id);
+            if (info) {
+                for (size_t i = 3; i < tokens.size(); i++) {
+                    string token = tokens[i];
+                    token.erase(0, token.find_first_not_of(" \t"));
+                    token.erase(token.find_last_not_of(" \t") + 1);
+                    size_t colonPos = token.find(':');
+                    if (colonPos != string::npos) {
+                        string subjectName = token.substr(0, colonPos);
+                        string scoreStr = token.substr(colonPos + 1);
+                        int score = stoi(scoreStr);
+                        if (!info->addSubject(subjectName, score)) {
+                            cout << "第" + to_string(lineNum) + "行：添加科目失败-" + subjectName;
+                            file.close();
+                            return false;
+                        }
                     }
                 }
-            }
-            if (!manager.addStudent(info)) {
-                setError("第" + to_string(lineNum) + "行：学生ID重复或添加失败");
-                file.close();
-                return false;
-            }
+            } else cout << tokens[1] << "学生不存在！请联系管理员添加账户"  << endl;
         } catch (const exception& e) {
-            setError("第" + to_string(lineNum) + "行解析错误：" + string(e.what()));
+            cout << "第" + to_string(lineNum) + "行解析错误：" + string(e.what());
             file.close();
             return false;
         }

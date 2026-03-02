@@ -5,7 +5,6 @@
 //  Created by lifany on 2026/2/7.
 //
 #include "information.h"
-
 // Subject
 Subject::Subject(const std::string& name, int score)
     :name(name), score(score), next(nullptr) {
@@ -15,7 +14,7 @@ Subject::Subject(const std::string& name, int score)
 Information::Information()
     :id(0), name(""), className(""), subjectHead(nullptr) {
 }
-Information::Information(int id, const std::string& name, const std::string& className)
+Information::Information(std::string id, const std::string& name, const std::string& className)
     :id(id), name(name), className(className), subjectHead(nullptr) {
 }
 Information::~Information() {
@@ -29,7 +28,7 @@ Information::~Information() {
 }
 
 // Getter
-int Information::getId() const {
+std::string Information::getId() const {
     return id;
 }
 std::string Information::getName() const {

@@ -20,13 +20,13 @@ public:
     StudentNode(const Information& info);
 };
 struct Appeal {
-    int id;
+    std::string id;
     std::string name;
     std::string type;
     std::string appeal;
     std::string reply;
     time_t createTime;
-    Appeal(int id, std::string name, std::string type)
+    Appeal(std::string id, std::string name, std::string type)
         :id(id), name(name), type(type) {
     }
 };
@@ -36,7 +36,7 @@ private:
     StudentNode* tail;
     int size;
     
-    StudentNode* findNodeById(int id) const;
+    StudentNode* findNodeById(std::string id) const;
     void swapNode(StudentNode* a, StudentNode* b);
 public:
     std::vector<Appeal> appeals;
@@ -50,13 +50,13 @@ public:
     StudentNode* getTail() const;
     
     bool addStudent(const Information& info);
-    bool removeStudentById(int id);      //  学生操作
-    Information* getStudentById(int id);
-    const Information* getStudentById(int id) const;  // 获取学生
+    bool removeStudentById(std::string id);      //  学生操作
+    Information* getStudentById(std::string id);
+    const Information* getStudentById(std::string id) const;  // 获取学生
     void sortByTotalScore(bool ascending = true);
     void sortByAverageScore(bool ascending = true);
     void sortBySubjectScore(const std::string& subjectName, bool ascending = true);   // 排序
-    bool getStudentRank(int studentId, int& myRank) const;
-    bool getStudentRank(int studentId, const std::string& subjectName, int& myRank) const;     // 排名
+    bool getStudentRank(std::string studentId, int& myRank) const;
+    bool getStudentRank(std::string studentId, const std::string& subjectName, int& myRank) const;     // 排名
 };
 #endif

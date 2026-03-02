@@ -38,19 +38,7 @@ void TeacherUI::waitForEnter() {
     cin.get();
 }
 
-vector<Information> TeacherUI::getMyClassStudents() const {
-    vector<Information> students;
-    StudentNode* curr = manager->getHead();
-    while (curr) {
-        if (curr->data.getClassName() == currentClass) {
-            students.push_back(curr->data);
-        }
-        curr = curr->next;
-    }
-    return students;
-}
-
-string TeacherUI::getRankString(int studentId, StudentManage* manager) {
+string TeacherUI::getRankString(string studentId, StudentManage* manager) {
     int rank = 0;
     if (manager->getStudentRank(studentId, rank)) {
         return "第" + to_string(rank) + "名";
@@ -58,7 +46,7 @@ string TeacherUI::getRankString(int studentId, StudentManage* manager) {
     return "无数据";
 }
 
-string TeacherUI::getRankString(int studentId, StudentManage* manager, const string& subject) {
+string TeacherUI::getRankString(string studentId, StudentManage* manager, const string& subject) {
     int rank = 0;
     if (manager->getStudentRank(studentId, subject, rank)) {
         return "第" + to_string(rank) + "名";
@@ -162,7 +150,6 @@ void TeacherUI::studentManageMenu(StudentManage* manager) {
         cout << "3. 修改学生信息" << endl;
         cout << "4. 查看学生信息" << endl;
         cout << "5. 返回上一级" << endl;
-        if (!isAdminMode) cout << "🔔 如需添加学生账户请联系管理员" << endl;
         cout << "---------------------------------" << endl;
         cout << "请选择：" ;
         int choice;
@@ -174,11 +161,11 @@ void TeacherUI::studentManageMenu(StudentManage* manager) {
                 break;
             case 2:
                 while (true) {
-                    int id;
+                    string id;
                     cout << "请输入删除学生的ID(输入0退出）：" ;
                     cin >> id;
                     cout << endl;
-                    if (id == 0) break;
+                    if (id == "0") break;
                     if (manager->removeStudentById(id)) {
                         cout << id << "删除成功！" << endl;
                     } else cout << id << "删除失败！" << endl;
@@ -190,10 +177,10 @@ void TeacherUI::studentManageMenu(StudentManage* manager) {
             case 4:
                 while (true) {
                     clearScreen();
-                    int stu;
+                    string stu;
                     cout << "请输入学生的ID(输入0退出）：" ;
                     cin >> stu;
-                    if (stu == 0) break;
+                    if (stu == "0") break;
                     Information* stuInfo = manager->getStudentById(stu);
                     if (stuInfo) {
                         TeacherUI::printStudentDetail(manager,*stuInfo);
@@ -216,8 +203,9 @@ void TeacherUI::addStudentSubject(StudentManage* manager) {
         clearScreen();
         cout << "==============学生成绩添加============" << endl;
         cout << "请输入学生ID(输入0退出）：" ;
-        int id;
+        string id;
         cin >> id;
+        if (id == "0") break;
         Information* curr = manager->getStudentById(id);
         if (!curr) {
             cout << "\n当前学生不存在！" << endl;
@@ -256,7 +244,7 @@ void TeacherUI::modifyStudent(StudentManage* manager) {
         cin >> choice;
         if (choice == 6) return;
         cout << "\n请输入修改的学生的ID：";
-        int id;
+        string id;
         cin >> id;
         Information* stu = manager->getStudentById(id);
         if (!stu) {
@@ -290,10 +278,12 @@ void TeacherUI::modifyStudent(StudentManage* manager) {
                 if (!stu->removeSubject(subName)) cout << "删除失败！" << endl;
                 break;
             case 4:
-                cout << "请输入学生姓名：";
+                cout << "请输入修改后的学生姓名：";
                 cin >> name;
                 cout << endl;
                 stu->setName(name);
+                cout << "修改成功！" << endl;
+                waitForEnter();
                 break;
             case 5:
                 cout << "请输入学生班级：";
@@ -310,7 +300,7 @@ void TeacherUI::modifyStudent(StudentManage* manager) {
 }
 
 void TeacherUI::printStudentDetail(StudentManage* manager, const Information &stu) {
-    int id = stu.getId();
+    string id = stu.getId();
     string strRank = TeacherUI::getRankString(id, manager);
     cout << "==============================" << endl;
     cout << "学号：" << stu.getId() << endl;
@@ -323,49 +313,56 @@ void TeacherUI::printStudentDetail(StudentManage* manager, const Information &st
         cout << "暂无学生数据" << endl;
         return;
     }
-    cout << left << setw(15) << "科目" << setw(10) << "成绩" << setw(10) << "排名" << endl;
+    cout << left << setw(15) << "科目" << setw(10) << "成绩" << setw(15) << "排名" << endl;
     cout << "------------------------------" << endl;
     while (sub) {
         string strSubRank = TeacherUI::getRankString(id, manager, sub->name);
         cout << left << setw(15) << sub->name << setw(10) << sub->score << setw(10) << strSubRank << endl;
         sub = sub->next;
     }
-    cout << "-------------------------------" << endl;
+    cout << "------------------------------" << endl;
     cout << "总分：" << stu.getTotalScore() << "分" << endl;
     cout << "平均分：" << fixed << setprecision(2) << stu.getAverageScore() << "分" << endl;
 }
 
 void TeacherUI::listClassStudents() {
-    vector<Information> students = getMyClassStudents();
+    vector<const Information*> students;
+    StudentNode* curr = manager->getHead();
+    while (curr) {
+        if (curr->data.getClassName() == currentClass) {
+            students.push_back(&curr->data);
+        }
+        curr = curr->next;
+    }
     if (students.empty()) {
         cout << "本班暂无学生数据" << endl;
         waitForEnter();
         return;
     }
     sort(students.begin(), students.end(),
-         [](const Information& a, const Information& b){
-        return a.getTotalScore() > b.getTotalScore();
+         [](const Information* a, const Information* b){
+        return a->getTotalScore() > b->getTotalScore();
     });
-    const int PAGE_SIZE = 20;
+    const int PAGE_SIZE = 5;
     size_t totalStudent = students.size();
     int totalPages = ((int)totalStudent + PAGE_SIZE - 1) / PAGE_SIZE;
     int currentPage = 1;
     while (true) {
         clearScreen();
-        cout << "==========" << currentClass << "成绩单=========" << endl;
+        cout << "===============" << currentClass << "成绩单===============" << endl;
         cout << "第" << currentPage << "页/共" << totalPages << "页" << endl;
         cout << "总人数：" << totalStudent << "人" << endl;
-        cout << "-----------------------------" << endl;
+        cout << "----------------------------------------" << endl;
         int startIdx = (currentPage - 1) * PAGE_SIZE;
         int endIdx = min(startIdx + PAGE_SIZE, (int)totalStudent);
-        cout << left << setw(6) << "名次" << setw(10) << "学号" << setw(15) << "姓名" << setw(10) << "总分" << setw(10) << "平均分" << endl;
-        cout << "-----------------------------" << endl;
+        cout << left << setw(10) << "名次" << setw(10) << "学号" << setw(15) << "姓名" << setw(10) << "总分" << setw(12) << "平均分" << endl;
+        cout << "----------------------------------------" << endl;
         for (int i = startIdx; i < endIdx; i++) {
-            const Information& stu = students[i];
+            const Information* stu = students[i];
             int rank = i + 1;
-            cout << left << setw(6) << rank << setw(10) << stu.getId() << setw(15) << stu.getName() << setw(10) << stu.getTotalScore() << fixed << setprecision(2) << setw(10) << stu.getAverageScore() << endl;
+            cout << left << setw(6) << rank << setw(10) << stu->getId() << setw(15) << stu->getName() << setw(10) << stu->getTotalScore() << fixed << setprecision(2) << setw(10) << stu->getAverageScore() << endl;
         }
-        cout << "-----------------------------" << endl;
+        cout << "----------------------------------------" << endl;
         cout << "n : 下一页    p : 上一页   q : 退出";
         char ch;
         cin >> ch;
@@ -449,12 +446,10 @@ bool TeacherUI::login() {
             if (auth->login()) {
                 if (auth->getCurrentRole() == "teacher") {
                     currentTeacherId = stoi(auth->getCurrentUserId());
-                    cout << "请输入您管理的班级名称：";
-                    cin >> currentClass;
-                    cout << endl;
-                    currentTeacherName = "教师";
+                    currentClass = auth->users[auth->getCurrentUserId()].className;
+                    currentTeacherName = auth->users[auth->getCurrentUserId()].realName;
                     isLoggedIn = true;
-                    cout << "🎉欢迎" << currentTeacherId << "老师！" << endl;
+                    cout << "🎉欢迎" << currentTeacherName << "老师！" << endl;
                     waitForEnter();
                     return true;
                 } else {

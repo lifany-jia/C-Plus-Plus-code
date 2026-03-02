@@ -15,21 +15,19 @@ class StudentUI {
 private:
     StudentManage* manager;
     Auth* auth;
-    int currentStudentId;
+    std::string currentStudentId;
     std::string currentClass;
     std::string currentStudentName;
     bool isLoggedIn;
     
     bool login();
-    void showMainMenu();
-    void analysisMenu();  //菜单
+    void showMainMenu(); //菜单
     void queryMyScores();
     void queryClassScores();  // 查询
     void showClassRanking();   // 排名
     void addAppeal();
     void showScoreBarChart(const std::vector<int>& scores, const std::string& title);  // 条状图
     Information* getCurrentStudent();
-    std::vector<Information> getClassStudents();  // 辅助函数
     void waitForEnter();
     void clearScreen();
 public:

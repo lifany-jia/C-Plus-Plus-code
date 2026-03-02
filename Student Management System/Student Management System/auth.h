@@ -23,10 +23,10 @@ struct User {
 };
 class Auth {
 private:
-    std::map<std::string, User> users;
     std::string currentUserId;
     bool isLoggedIn;
 public:
+    std::map<std::string, User> users;
     Auth();
     //用户管理
     bool login();

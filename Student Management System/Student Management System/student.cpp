@@ -41,23 +41,11 @@ Information* StudentUI::getCurrentStudent() {
     return nullptr;
 }
 
-vector<Information> StudentUI::getClassStudents() {
-    vector<Information> result;
-    StudentNode* curr = manager->getHead();
-    while (curr) {
-        if (curr->data.getClassName() == currentClass) {
-            result.push_back(curr->data);
-        }
-        curr = curr->next;
-    }
-    return result;
-}
-
 void StudentUI::showMainMenu() {
     while (isLoggedIn) {
         clearScreen();
         cout << "============================" << endl;
-        cout << "       🧑‍🎓学生成绩查询系统" << endl;
+        cout << "     🧑‍🎓学生成绩查询系统" << endl;
         cout << "============================" << endl;
         cout << "当前用户：" << currentStudentName << endl;
         cout << "班   级：" << currentClass << endl;
@@ -80,7 +68,7 @@ void StudentUI::showMainMenu() {
                 queryClassScores();
                 break;
             case 3:
-                analysisMenu();
+                showClassRanking();
                 break;
             case 4:
                 auth->changePassword();
@@ -173,7 +161,7 @@ void StudentUI::queryMyScores() {
     int totalScore = curr->getTotalScore();
     int subjectCount = curr->getScoreCount();
     string bestSubject, worstSubject;
-    cout << left << setw(20) << "科目" << setw(10) << "成绩" << setw(10) << "评级" << setw(10) << "班级排名" << endl;
+    cout << left << setw(25) << "科目" << setw(12) << "成绩" << setw(12) << "评级" << setw(15) << "班级排名" << endl;
     cout << "-----------------------------" << endl;
     while (sub) {
         string grade;
@@ -190,7 +178,7 @@ void StudentUI::queryMyScores() {
         else if (sub->score >= 60) grade = "及格";
         else  grade = "不及格";
         
-        cout << left << setw(20) << sub->name << setw(10) << sub->score << setw(10) << grade  << setw(10) << strRank << endl;
+        cout << left << setw(25) << sub->name << setw(12) << sub->score << setw(12) << grade  << setw(15) << strRank << endl;
         sub = sub->next;
     }
     cout << "-----------------------------" << endl;
@@ -210,23 +198,30 @@ void StudentUI::queryMyScores() {
 
 void StudentUI::queryClassScores() {
     clearScreen();
-    cout << "============================" << endl;
-    cout << "     " << currentClass << "成绩单"  << endl;
-    cout << "============================" << endl;
-    vector<Information> classStudents = getClassStudents();
+    cout << "===================================" << endl;
+    cout << "         " << currentClass << "成绩单"  << endl;
+    cout << "===================================" << endl;
+    vector<const Information*> classStudents;
+    StudentNode* curr = manager->getHead();
+    while (curr) {
+        if (curr->data.getClassName() == currentClass) {
+            classStudents.push_back(&curr->data);
+        }
+        curr = curr->next;
+    }
     if (classStudents.empty()) {
         cout << "本班暂无学生数据" << endl;
         waitForEnter();
         return ;
     }
     sort(classStudents.begin(), classStudents.end(),
-         [](const Information& a, const Information& b) {
-        return a.getId() < b.getId();
+         [](const Information* a, const Information* b) {
+        return a->getId() < b->getId();
     });
-    cout << left << setw(10) << "学号" << setw(10) << "姓名" << setw(10) << "总分" << setw(10) << "平均分" << endl;
-    cout << "-----------------------------" << endl;
+    cout << left << setw(20) << "学号" << setw(10) << "姓名" << setw(10) << "总分" << setw(10) << "平均分" << endl;
+    cout << "-----------------------------------" << endl;
     for (const auto& student : classStudents) {
-        cout << left << setw(10) << student.getId() << setw(10) << student.getName() << student.getTotalScore() << setw(10) << student.getAverageScore() << endl;
+        cout << left << setw(15) << student->getId() << setw(10) << student->getName() << setw(10) << student->getTotalScore() << setw(10) << student->getAverageScore() << endl;
     }
     waitForEnter();
 }
@@ -243,7 +238,14 @@ void StudentUI::showClassRanking() {
         int choice;
         cin >> choice;
         cout << endl;
-        vector<Information> students = getClassStudents();
+        vector<const Information*> students;
+        StudentNode* curr = manager->getHead();
+        while (curr) {
+            if (curr->data.getClassName() == currentClass) {
+                students.push_back(&curr->data);
+            }
+            curr = curr->next;
+        }
         if (students.empty()) {
             cout << "本班暂无学生数据" << endl;
             waitForEnter();
@@ -251,19 +253,19 @@ void StudentUI::showClassRanking() {
         }
         if (choice == 1) {
             sort(students.begin(), students.end(),
-                 [](const Information& a, const Information& b) {
-                return a.getTotalScore() < b.getTotalScore();
+                 [](const Information* a, const Information* b) {
+                return a->getTotalScore() > b->getTotalScore();
             });
             clearScreen();
-            cout << "============================" << endl;
-            cout << "           总分排名" << endl;
-            cout << "============================" << endl;
-            cout << left << setw(6) << "名次" << setw(10) << "学号" << setw(10) << "姓名" << setw(10) << "总分" << endl;
-            cout << "----------------------------" << endl;
+            cout << "==================================" << endl;
+            cout << "              总分排名" << endl;
+            cout << "==================================" << endl;
+            cout << left << setw(10) << "名次" << setw(15) << "学号" << setw(10) << "姓名" << setw(10) << "总分" << endl;
+            cout << "----------------------------------" << endl;
             
             for (int i = 0; i < students.size(); i++) {
-                cout << left << setw(6) << i + 1 << setw(10) << students[i].getId() << setw(10) <<
-                students[i].getName() << setw(10) << students[i].getTotalScore() << endl;
+                cout << left << setw(6) << i + 1 << setw(15) << students[i]->getId() << setw(10) <<
+                students[i]->getName() << setw(10) << students[i]->getTotalScore() << endl;
             }
             waitForEnter();
             cout << "是否以条状图呈现（y/n）：" ;
@@ -279,7 +281,6 @@ void StudentUI::showClassRanking() {
                 }
                 showScoreBarChart(scores, "总分分布图");
             }
-            waitForEnter();
         } else if (choice == 2) {
             map<string, bool> allSubjects;
             StudentNode* stu = manager->getHead();
@@ -312,8 +313,8 @@ void StudentUI::showClassRanking() {
                 if (subChoice >= 1 && subChoice <= subjectList.size()) {
                     string selectSubject = subjectList[subChoice - 1];
                     sort(students.begin(), students.end(),
-                         [selectSubject](const Information& a, const Information& b) {
-                        return a.getSubjectScore(selectSubject) < b.getSubjectScore(selectSubject);
+                         [selectSubject](const Information* a, const Information* b) {
+                        return a->getSubjectScore(selectSubject) > b->getSubjectScore(selectSubject);
                     });
                     clearScreen();
                     cout << "============================" << endl;
@@ -323,7 +324,7 @@ void StudentUI::showClassRanking() {
                     cout << "----------------------------" << endl;
                     for (int i = 0; i < subjectList.size(); i++) {
                         int score;
-                        cout << left << setw(6) << i + 1 << setw(10) << students[i].getId() << setw(10) << students[i].getName() << setw(10) << students[i].getSubjectScore(selectSubject) << endl;
+                        cout << left << setw(6) << i + 1 << setw(10) << students[i]->getId() << setw(10) << students[i]->getName() << setw(10) << students[i]->getSubjectScore(selectSubject) << endl;
                     }
                     waitForEnter();
                     cout << "是否以条状图呈现（y/n）：" ;
@@ -340,7 +341,6 @@ void StudentUI::showClassRanking() {
                         }
                         showScoreBarChart(scores, selectSubject + "分布图");
                     }
-                    waitForEnter();
                 } else if (subChoice == 0) {
                     break;
                 } else {
@@ -349,32 +349,6 @@ void StudentUI::showClassRanking() {
             }
         } else {
             return;
-        }
-        waitForEnter();
-    }
-}
-
-void StudentUI::analysisMenu() {
-    while (true) {
-        clearScreen();
-        cout << "============================" << endl;
-        cout << "         🧐成绩分析菜单" << endl;
-        cout << "============================" << endl;
-        cout << "1. 班级排名" << endl;
-        cout << "2. 返回上一级" << endl;
-        cout << "============================" << endl;
-        cout << "请选择：";
-        int choice;
-        cin >> choice;
-        cout << endl;
-        switch (choice) {
-            case 1:
-                showClassRanking();
-                break;
-            case 2: return;
-            default:
-                cout << "无效选择，请重新输入！" << endl;
-                waitForEnter();
         }
     }
 }
@@ -446,7 +420,7 @@ bool StudentUI::login() {
                     StudentNode* curr = manager->getHead();
                     bool found = false;
                     while (curr) {
-                        if (to_string(curr->data.getId()) == userId) {
+                        if (curr->data.getId() == userId) {
                             currentClass = curr->data.getClassName();
                             currentStudentId = curr->data.getId();
                             currentStudentName = curr->data.getName();
@@ -482,14 +456,10 @@ bool StudentUI::login() {
 void StudentUI::run() {
     while (true) {
         if (!isLoggedIn) {
-            bool loginSuccess = login();
-            if (!loginSuccess) {
-                cout << "返回主菜单..." << endl;
-                waitForEnter();
+            if (!login()) {
                 break;
             }
-        } else {
-            showMainMenu();
         }
+        showMainMenu();
     }
 }

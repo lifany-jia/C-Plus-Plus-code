@@ -20,16 +20,16 @@ public:
 
 class Information {
 private:
-    int id;
+    std::string id;
     std::string name;
     std::string className;
     Subject* subjectHead;
 public:
     Information();
-    Information(int id, const std::string& name, const std::string& className);
+    Information(std::string id, const std::string& name, const std::string& className);
     ~Information();
     
-    int getId() const;
+    std::string getId() const;
     std::string getName() const;
     std::string getClassName() const;
     Subject* getSubjectHead() const;

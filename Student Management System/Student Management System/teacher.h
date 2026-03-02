@@ -16,24 +16,24 @@ class TeacherUI {
 private:
     StudentManage* manager;
     Auth* auth;
-    int currentTeacherId;
+    std::string currentTeacherId;
     std::string currentTeacherName;
     std::string currentClass;
     bool isLoggedIn;
+    bool isAdminMode;
     
     bool login();
     void showMainMenu();// 菜单
     void listClassStudents();  // 学生操作
     void addAppeal();
-    std::vector<Information> getMyClassStudents() const;
+    std::vector<Information> getMyClssStudents() const;
 public:
-    static bool isAdminMode;
     static void studentManageMenu(StudentManage* manager);
     static void addStudentSubject(StudentManage* manager);
     static void modifyStudent(StudentManage* manager);
     static void printStudentDetail(StudentManage* manager, const Information& stu);
-    static std::string getRankString(int studentId, StudentManage* manager) ;
-    static std::string getRankString(int studentId, StudentManage* manager, const std::string& subject);
+    static std::string getRankString(std::string studentId, StudentManage* manager) ;
+    static std::string getRankString(std::string studentId, StudentManage* manager, const std::string& subject);
     static void waitForEnter();
     static void clearScreen();
     TeacherUI(StudentManage* mgr, Auth* auth);

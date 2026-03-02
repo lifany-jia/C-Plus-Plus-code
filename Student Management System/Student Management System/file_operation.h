@@ -22,13 +22,8 @@ private:
 public:
     static bool saveBinary(const StudentManage& manager);
     static bool loadBinary(StudentManage& manager);
-    
     static bool saveText(const StudentManage& manager);
     static bool loadText(StudentManage& manager);
-    
-    static std::string lastError;
-    static void setError(const std::string& error);
-    static std::string getError();
 };
 
 #endif
