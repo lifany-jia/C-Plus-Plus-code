@@ -182,10 +182,14 @@ StudentNode* StudentManage::getTail() const {
 bool StudentManage::getStudentRank(std::string studentId, int& myRank) const {
     const Information* currStudent = getStudentById(studentId);
     if (!currStudent) return false;
+    std::string currClass = currStudent->getClassName();
+    if (!currStudent) return false;
     std::vector<std::pair<std::string, int>> classTotalScore;
     StudentNode* curr = getHead();
     while (curr) {
-        classTotalScore.push_back({curr->data.getId(), curr->data.getTotalScore()});
+        if (curr->data.getClassName() == currClass){
+            classTotalScore.push_back({curr->data.getId(), curr->data.getTotalScore()});
+        }
         curr = curr->next;
     }
     std::sort(classTotalScore.begin(), classTotalScore.end(),
@@ -204,12 +208,15 @@ bool StudentManage::getStudentRank(std::string studentId, int& myRank) const {
 bool StudentManage::getStudentRank(std::string studentId, const std::string &subjectName, int& myRank) const {
     const Information* currStudent = getStudentById(studentId);
     if (!currStudent) return false;
+    std::string currClass = currStudent->getClassName();
     std::vector<std::pair<std::string, int>> classScores;
     StudentNode* curr = getHead();
     while (curr) {
-        int score = curr->data.getSubjectScore(subjectName);
-        if (score != -1) {
-            classScores.push_back({curr->data.getId(), score});
+        if (curr->data.getClassName() == currClass) {
+            int score = curr->data.getSubjectScore(subjectName);
+            if (score != -1) {
+                classScores.push_back({curr->data.getId(), score});
+            }
         }
         curr = curr->next;
     }

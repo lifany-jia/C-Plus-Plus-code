@@ -28,6 +28,7 @@ private:
     void addAppeal();
     void showScoreBarChart(const std::vector<int>& scores, const std::string& title);  // 条状图
     Information* getCurrentStudent();
+    std::vector<const Information*> getMyClass();
     void waitForEnter();
     void clearScreen();
 public:

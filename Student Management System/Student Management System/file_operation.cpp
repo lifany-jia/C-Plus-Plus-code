@@ -39,10 +39,11 @@ bool FileOperation::saveBinary(const StudentManage& manager) {
     while (curr) {
         const Information& info = curr->data;
         string id = info.getId();
+        size_t idLen = id.length();
         string name = info.getName();
         string className = info.getClassName();
-        file.write(reinterpret_cast<const char*>(&id), sizeof(id));
-        
+        file.write(reinterpret_cast<const char*>(&idLen), sizeof(idLen));
+        file.write(id.c_str(), idLen);
         size_t nameLen = name.length();
         file.write(reinterpret_cast<const char*>(&nameLen), sizeof(nameLen));
         file.write(name.c_str(), nameLen);
@@ -125,43 +126,62 @@ bool FileOperation::loadBinary(StudentManage &manager) {
         file.close();
         return false;
     }
+    
+    int errorCount = 0;
+    
     for (int i = 0; i < header.studentCount; i++) {
-        string id;
-        file.read(reinterpret_cast<char*>(&id), sizeof(id));
-        size_t nameLen;
-        file.read(reinterpret_cast<char*>(&nameLen), sizeof(nameLen));
-        string name(nameLen, ' ');
-        file.read(&name[0], nameLen);
-        size_t classLen;
-        file.read(reinterpret_cast<char*>(&classLen), sizeof(classLen));
-        string className(classLen, ' ');
-        file.read(&className[0], classLen);
-        Information* info = manager.getStudentById(id);
-        if (info) {
-            int subjectCount;
-            file.read(reinterpret_cast<char*>(&subjectCount), sizeof(subjectCount));
-            for (int j = 0; j < subjectCount; j++) {
-                size_t subNameLen;
-                file.read(reinterpret_cast<char*>(&subNameLen), sizeof(subNameLen));
-                string subjectName(subNameLen, ' ');
-                file.read(&subjectName[0], subNameLen);
-                int score;
-                file.read(reinterpret_cast<char*>(&score), sizeof(score));
-                if (!info->addSubject(subjectName, score)) {
-                    cout << "添加科目失败：" + subjectName;
-                    file.close();
-                    return false;
+        try {
+            size_t idLen;
+            file.read(reinterpret_cast<char*>(&idLen), sizeof(idLen));
+            string id(idLen, ' ');
+            file.read(&id[0], idLen);
+            size_t nameLen;
+            file.read(reinterpret_cast<char*>(&nameLen), sizeof(nameLen));
+            string name(nameLen, ' ');
+            file.read(&name[0], nameLen);
+            size_t classLen;
+            file.read(reinterpret_cast<char*>(&classLen), sizeof(classLen));
+            string className(classLen, ' ');
+            file.read(&className[0], classLen);
+            Information* info = manager.getStudentById(id);
+            if (info) {
+                int subjectCount;
+                file.read(reinterpret_cast<char*>(&subjectCount), sizeof(subjectCount));
+                for (int j = 0; j < subjectCount; j++) {
+                    size_t subNameLen;
+                    file.read(reinterpret_cast<char*>(&subNameLen), sizeof(subNameLen));
+                    string subjectName(subNameLen, ' ');
+                    file.read(&subjectName[0], subNameLen);
+                    int score;
+                    file.read(reinterpret_cast<char*>(&score), sizeof(score));
+                    if (!info->addSubject(subjectName, score)) {
+                        cout << "添加科目失败：" + subjectName;
+                        errorCount++;
+                        continue;
+                    }
                 }
+            } else {
+                cout << name << " 不存在该学生！请联系管理员添加学生账户" << endl;
+                errorCount++;
+                int subjectCount;
+                file.read(reinterpret_cast<char*>(&subjectCount), sizeof(subjectCount));
+                for (int j = 0; j < subjectCount; j++) {
+                    size_t subNameLen;
+                    file.read(reinterpret_cast<char*>(&subNameLen), sizeof(subNameLen));
+                    file.seekg(subNameLen, ios::cur);
+                    file.seekg(sizeof(int), ios::cur);
+                }
+                continue;
             }
-            if (!manager.addStudent(*info)) {
-                cout << "添加学生失败：" + name;
-                file.close();
-                return false;
-            }
-        } else cout << name << " 不存在该学生！请联系管理员添加学生账户" << endl;
+        } catch (const exception& e) {
+            cout << "❌ 读取学生数据时出错： " << e.what() << endl;
+            errorCount++;
+            file.clear();
+            break;
+        }
     }
     file.close();
-    cout << "导入成功" << endl;
+    cout << "导入结束\n错误：" << errorCount << "个" << endl;
     return true;
 }
     
@@ -179,6 +199,7 @@ bool FileOperation::loadText(StudentManage &manager) {
     }
     string line;
     int lineNum = 0;
+    int errorCount = 0;
     while (getline(file, line)) {
         lineNum++;
         if (line.empty()) continue;
@@ -196,8 +217,8 @@ bool FileOperation::loadText(StudentManage &manager) {
         tokens.push_back(line.substr(start));
         if (tokens.size() < 3) {
             cout << "第" + to_string(lineNum) + "行格式错误：数据字段不足";
-            file.close();
-            return false;
+            errorCount++;
+            continue;
         }
         try {
             string id = tokens[0];
@@ -214,20 +235,21 @@ bool FileOperation::loadText(StudentManage &manager) {
                         int score = stoi(scoreStr);
                         if (!info->addSubject(subjectName, score)) {
                             cout << "第" + to_string(lineNum) + "行：添加科目失败-" + subjectName;
-                            file.close();
-                            return false;
                         }
                     }
                 }
-            } else cout << tokens[1] << "学生不存在！请联系管理员添加账户"  << endl;
+            } else {
+                cout << tokens[1] << "学生不存在！请联系管理员添加账户"  << endl;
+                errorCount++;
+            }
         } catch (const exception& e) {
             cout << "第" + to_string(lineNum) + "行解析错误：" + string(e.what());
-            file.close();
-            return false;
+            errorCount++;
+            continue;
         }
     }
     file.close();
-    cout << "导入成功" << endl;
+    cout << "导入结束\n错误：" << errorCount << "行\n共" << lineNum << "行" << endl;
     return true;
 }
 

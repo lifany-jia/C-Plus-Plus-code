@@ -84,6 +84,7 @@ bool Auth::addUser(const User &user) {
 }
 
 bool Auth::changePassword() {
+    TeacherUI::clearScreen();
     cout << "==========修改密码==========" << endl;
     cout << "(输入0退出修改密码📃)" << endl;
     auto it = users.end();
@@ -129,6 +130,7 @@ bool Auth::changePassword() {
             cout << "⚠️ 您修改了自己的密码，请重新登录" << endl;
             isLoggedIn = false;
             currentUserId = "";
+            TeacherUI::waitForEnter();
             return true;
         }
     } else {
@@ -179,6 +181,7 @@ bool Auth::changePassword() {
         isLoggedIn = false;
         currentUserId = "";
     }
+    TeacherUI::waitForEnter();
     return true;
 }
 

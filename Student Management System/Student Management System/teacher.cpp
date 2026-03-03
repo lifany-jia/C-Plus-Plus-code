@@ -84,7 +84,7 @@ void TeacherUI::showMainMenu() {
                 listClassStudents();
                 break;
             case 3:
-                printf("没写");
+                showClassAverage();
                 break;
             case 4:
                 cout << "1. 保存为文本文件" << endl;
@@ -426,6 +426,49 @@ void TeacherUI::addAppeal() {
     }
 }
 
+void TeacherUI::showClassAverage() {
+    clearScreen();
+    cout << "============成绩分析============" << endl;
+    vector<Information*> myClass;
+    StudentNode* curr = manager->getHead();
+    while (curr) {
+        if (curr->data.getClassName() == currentClass) {
+            myClass.push_back(&curr->data);
+        }
+        curr = curr->next;
+    }
+    if (myClass.empty()) {
+        cout << "本班暂无学生数据" << endl;
+        waitForEnter();
+        return;
+    }
+    cout << "班级：" << currentClass << endl;
+    cout << "总人数：" << myClass.size() << "人" << endl;
+    int total = 0;
+    for (const auto& stu : myClass) {
+        total += stu->getTotalScore();
+    }
+    cout << "班级总平均分：" << fixed << setprecision(2) << (double)total / myClass.size() << endl;
+    map<string, pair<int, int>> subjects;
+    for (const auto& stu : myClass) {
+        Subject* sub = stu->getSubjectHead();
+        while (sub) {
+            subjects[sub->name].first += sub->score;
+            subjects[sub->name].second++;
+            sub = sub->next;
+        }
+    }
+    if (subjects.empty()) {
+        cout << "暂无科目成绩数据" << endl;
+    } else {
+        for (const auto& item : subjects) {
+            double avg = (double)item.second.first / item.second.second;
+            cout << left << setw(15) << item.first << setw(10) << "平均分"  << setw(10) << fixed << setprecision(2) << avg << endl;
+        }
+    }
+    waitForEnter();
+}
+
 bool TeacherUI::login() {
     if (isAdminMode) {
         return true;
@@ -445,7 +488,7 @@ bool TeacherUI::login() {
         if (choice == 1) {
             if (auth->login()) {
                 if (auth->getCurrentRole() == "teacher") {
-                    currentTeacherId = stoi(auth->getCurrentUserId());
+                    currentTeacherId = auth->getCurrentUserId();
                     currentClass = auth->users[auth->getCurrentUserId()].className;
                     currentTeacherName = auth->users[auth->getCurrentUserId()].realName;
                     isLoggedIn = true;

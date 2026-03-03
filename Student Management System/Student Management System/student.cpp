@@ -40,6 +40,21 @@ Information* StudentUI::getCurrentStudent() {
     }
     return nullptr;
 }
+vector<const Information*> StudentUI::getMyClass() {
+    vector<const Information*> myClass;
+    StudentNode* curr = manager->getHead();
+    if (!curr) {
+        cout << "manager是空指针！" <<endl;
+        return myClass;
+    }
+    while (curr) {
+        if (curr->data.getClassName() == currentClass) {
+            myClass.push_back(&curr->data);
+        }
+        curr = curr->next;
+    }
+    return myClass;
+}
 
 void StudentUI::showMainMenu() {
     while (isLoggedIn) {
@@ -110,12 +125,6 @@ void StudentUI::showScoreBarChart(const std::vector<int> &scores, const std::str
         else if (score >= 60) distribution["60 - 69"]++;
         else distribution["0 - 59"]++;
     }
-    cout << "\n" << title << endl;
-    cout << "============================" << endl;
-    cout << "最高分：" << maxScore << "分" << endl;
-    cout << "最低分：" << minScore << "分" << endl;
-    cout << "平均分：" << fixed << setprecision(2) << avgScore << "分" << endl;
-    cout << "============================" << endl;
     
     int maxCount = 0;
     for (const auto& pair : distribution) {
@@ -125,7 +134,11 @@ void StudentUI::showScoreBarChart(const std::vector<int> &scores, const std::str
         cout << "暂无成绩数据📊" << endl;
         return;
     }
-    cout << "\n      成绩分布图📊" << endl;
+    cout << "\n" << title << endl;
+    cout << "============================" << endl;
+    cout << "最高分：" << maxScore << "分" << endl;
+    cout << "最低分：" << minScore << "分" << endl;
+    cout << "平均分：" << fixed << setprecision(2) << avgScore << "分" << endl;
     cout << "============================" << endl;
     double scale = (maxCount > 20) ? 20.0 / maxCount : 1.0;
     for (const auto& pair : distribution) {
@@ -201,14 +214,7 @@ void StudentUI::queryClassScores() {
     cout << "===================================" << endl;
     cout << "         " << currentClass << "成绩单"  << endl;
     cout << "===================================" << endl;
-    vector<const Information*> classStudents;
-    StudentNode* curr = manager->getHead();
-    while (curr) {
-        if (curr->data.getClassName() == currentClass) {
-            classStudents.push_back(&curr->data);
-        }
-        curr = curr->next;
-    }
+    vector<const Information*> classStudents = getMyClass();
     if (classStudents.empty()) {
         cout << "本班暂无学生数据" << endl;
         waitForEnter();
@@ -232,20 +238,14 @@ void StudentUI::showClassRanking() {
         cout << "===============排名系统=============" << endl;
         cout << "1. 总分排名" << endl;
         cout << "2. 单科排名" << endl;
-        cout << "3. 返回🔙" << endl;
-        cout << "============================" << endl;
+        cout << "3. 总分分布图 " << endl;
+        cout << "4. 返回🔙" << endl;
+        cout << "===================================" << endl;
         cout << "请输入指令：";
         int choice;
         cin >> choice;
         cout << endl;
-        vector<const Information*> students;
-        StudentNode* curr = manager->getHead();
-        while (curr) {
-            if (curr->data.getClassName() == currentClass) {
-                students.push_back(&curr->data);
-            }
-            curr = curr->next;
-        }
+        vector<const Information*> students = getMyClass();
         if (students.empty()) {
             cout << "本班暂无学生数据" << endl;
             waitForEnter();
@@ -268,27 +268,16 @@ void StudentUI::showClassRanking() {
                 students[i]->getName() << setw(10) << students[i]->getTotalScore() << endl;
             }
             waitForEnter();
-            cout << "是否以条状图呈现（y/n）：" ;
-            char ch;
-            cin >> ch;
-            cout << endl;
-            if (ch == 'y' || ch == 'Y') {
-                vector<int> scores;
-                StudentNode* stu = manager->getHead();
-                while (stu) {
-                    scores.push_back(stu->data.getTotalScore());
-                    stu = stu->next;
-                }
-                showScoreBarChart(scores, "总分分布图");
-            }
         } else if (choice == 2) {
             map<string, bool> allSubjects;
             StudentNode* stu = manager->getHead();
             while (stu) {
-                Subject* curr = stu->data.getSubjectHead();
-                while (curr) {
-                    allSubjects[curr->name] = true;
-                    curr = curr->next;
+                if (stu->data.getClassName() == currentClass) {
+                    Subject* curr = stu->data.getSubjectHead();
+                    while (curr) {
+                        allSubjects[curr->name] = true;
+                        curr = curr->next;
+                    }
                 }
                 stu = stu->next;
             }
@@ -322,7 +311,7 @@ void StudentUI::showClassRanking() {
                     cout << "============================" << endl;
                     cout << left << setw(6) << "名次" << setw(10) << "学号" << setw(10) << "姓名" << setw(10) << "成绩" << endl;
                     cout << "----------------------------" << endl;
-                    for (int i = 0; i < subjectList.size(); i++) {
+                    for (int i = 0; i < students.size(); i++) {
                         int score;
                         cout << left << setw(6) << i + 1 << setw(10) << students[i]->getId() << setw(10) << students[i]->getName() << setw(10) << students[i]->getSubjectScore(selectSubject) << endl;
                     }
@@ -335,8 +324,10 @@ void StudentUI::showClassRanking() {
                         vector<int> scores;
                         stu = manager->getHead();
                         while (stu) {
-                            int subScore = stu->data.getSubjectScore(selectSubject);
-                            scores.push_back(subScore);
+                            if (stu->data.getClassName() == currentClass) {
+                                int subScore = stu->data.getSubjectScore(selectSubject);
+                                scores.push_back(subScore);
+                            }
                             stu = stu->next;
                         }
                         showScoreBarChart(scores, selectSubject + "分布图");
@@ -347,6 +338,55 @@ void StudentUI::showClassRanking() {
                     cout << "❌ 输入错误" << endl;
                 }
             }
+        } else if (choice == 3) {
+            vector<int> scores;
+            StudentNode* stu = manager->getHead();
+            while (stu) {
+                if (stu->data.getClassName() == currentClass) {
+                    scores.push_back(stu->data.getTotalScore());
+                }
+                stu = stu->next;
+            }
+            map<string, int> distribution;
+            distribution["600+"] = 0;
+            distribution["500 - 600"] = 0;
+            distribution["400 - 500"] = 0;
+            distribution["300 - 400"] = 0;
+            distribution["0 - 300"] = 0;
+            
+            int maxScore = *max_element(scores.begin(), scores.end());
+            int minScore = *min_element(scores.begin(), scores.end());
+            
+            double avgScore = accumulate(scores.begin(), scores.end(), 0.0) / scores.size();
+            for (int score : scores) {
+                if (score >= 600) distribution["600+"]++;
+                else if (score >= 500) distribution["500 - 600"]++;
+                else if (score >= 400) distribution["400 - 500"]++;
+                else if (score >= 300) distribution["300 - 400"]++;
+                else distribution["0 - 300"]++;
+            }
+            int maxCount = 0;
+            for (const auto& pair : distribution) {
+                if (pair.second > maxCount) maxCount = pair.second;
+            }
+            if (maxCount == 0) {
+                cout << "暂无成绩数据📊" << endl;
+                return;
+            }
+            cout << "\n" << "总分条形图📊" << endl;
+            cout << "============================" << endl;
+            cout << "最高分：" << maxScore << "分" << endl;
+            cout << "最低分：" << minScore << "分" << endl;
+            cout << "平均分：" << fixed << setprecision(2) << avgScore << "分" << endl;
+            cout << "============================" << endl;
+            double scale = (maxCount > 20) ? 20.0 / maxCount : 1.0;
+            for (const auto& pair : distribution) {
+                cout << left << setw(8) << pair.first << "|";
+                int starCount = static_cast<int>(pair.second * scale);
+                cout << left << setw(20) << string(starCount, '*');
+                cout << right << setw(4) << pair.second << "人" << endl;
+            }
+            waitForEnter();
         } else {
             return;
         }

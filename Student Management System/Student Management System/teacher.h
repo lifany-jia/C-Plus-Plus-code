@@ -26,7 +26,7 @@ private:
     void showMainMenu();// 菜单
     void listClassStudents();  // 学生操作
     void addAppeal();
-    std::vector<Information> getMyClssStudents() const;
+    void showClassAverage();
 public:
     static void studentManageMenu(StudentManage* manager);
     static void addStudentSubject(StudentManage* manager);
