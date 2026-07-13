@@ -1,122 +1,140 @@
-# QQ Music
+# Student Management System
 
-一个使用 Objective-C 和 UIKit 编写的仿 QQ 音乐 iOS 练习项目。项目主要实现了音乐首页、个人中心、侧边菜单、迷你播放器、播放详情页和本地音频播放等基础功能，适合用于学习 UIKit 页面搭建、TableView/CollectionView 组合布局、Masonry 自动布局和 AVPlayer 播放控制。
+一个基于 C++ 的命令行学生管理系统，支持学生、教师、管理员三类角色。项目使用链表保存学生信息和成绩数据，提供成绩查询、班级统计、账户管理、批量导入导出等功能。
 
-## 功能简介
+## 功能概览
 
-- 首页推荐流：包含歌单入口、歌曲推荐、AI 歌单等分区内容
-- 我的页面：展示用户信息、自建歌单、收藏歌单和常用入口
-- 侧边菜单：支持首页抽屉式菜单和个人页更多菜单
-- 迷你播放器：底部显示当前播放歌曲，并支持播放/暂停
-- 播放详情页：展示封面、歌曲名、歌手、进度条、上一首、下一首、播放/暂停
-- 本地音乐播放：通过 `AVPlayer` 播放工程内置的 `.m4a` 音频文件
-- 深色模式切换：更多菜单中支持切换浅色/深色外观
+### 学生端
 
-## 技术栈
+- 登录学生账号
+- 查看个人成绩单
+- 查看本班成绩
+- 查看成绩分析和班级排名
+- 修改个人密码
+- 向管理员提交反馈
 
-- Objective-C
-- UIKit
-- AVFoundation / AVPlayer
-- Masonry
-- CocoaPods
-- SF Symbols
+### 教师端
+
+- 登录教师账号
+- 添加、删除、修改、查看学生信息
+- 查看班级学生成绩
+- 查看班级平均分统计
+- 将学生成绩保存为文本文件或二进制文件
+- 从文本文件或二进制文件导入成绩
+- 向管理员提交反馈
+
+### 管理员端
+
+- 管理学生信息
+- 新增、删除账户
+- 修改用户密码
+- 以教师身份进入教师端
+- 查看并回复待办反馈
+- 批量导入学生或教师账户
+- 导出用户账户信息
 
 ## 项目结构
 
 ```text
-Music
-├── AppDelegate.* / SceneDelegate.*     # App 启动与窗口配置
-├── MyTabBarVC.*                        # 底部 TabBar 与迷你播放器
-├── Home/                               # 首页、首页模型、抽屉菜单、Header 视图
-├── Person/                             # 我的页面和更多菜单
-├── Music/                              # 播放详情页和播放器单例
-├── Cell/                               # 首页、歌单、菜单相关自定义 Cell
-├── Assets.xcassets                     # 图片资源
-└── *.m4a                               # 本地音频资源
+Student Management System/
+├── main.cpp                 # 程序入口和主菜单
+├── auth.h / auth.cpp        # 用户登录、登出、密码修改、账户管理
+├── student.h / student.cpp  # 学生端界面和功能
+├── teacher.h / teacher.cpp  # 教师端界面和功能
+├── manager.h / manager.cpp  # 管理员端界面和功能
+├── information.h / information.cpp
+│                            # 学生基础信息和科目成绩结构
+├── student_manage.h / student_manage.cpp
+│                            # 学生链表管理、排序、排名
+├── file_operation.h / file_operation.cpp
+│                            # 文本和二进制文件读写
+├── studentAuth.txt          # 学生账户导入示例
+├── teacherAuth.txt          # 教师账户导入示例
+└── studentScore.txt         # 学生成绩导入示例
 ```
 
-## 环境要求
+仓库同时包含 Xcode 工程文件，可以直接使用 Xcode 打开并运行。
 
-- macOS
-- Xcode
-- iOS 26.2 或更高版本模拟器/真机
-- CocoaPods
+## 运行方式
 
-> 当前 Xcode 工程中的 `IPHONEOS_DEPLOYMENT_TARGET` 为 `26.2`。如果你的本地 Xcode 或模拟器版本较低，需要在 Xcode 的 Build Settings 中调整 Deployment Target，并确认代码中使用的 API 在目标系统可用。
+### 使用 Xcode
 
-## 安装与运行
+1. 打开 `Student Management System .xcodeproj`
+2. 选择项目 Scheme
+3. 点击 Run 运行
 
-1. 克隆或下载项目后进入工程目录：
+### 使用命令行编译
 
-   ```bash
-   cd "oc/UIKit/Music"
-   ```
+在源码目录下执行：
 
-2. 安装依赖：
-
-   ```bash
-   pod install
-   ```
-
-3. 使用 Xcode 打开工作区：
-
-   ```bash
-   open Music.xcworkspace
-   ```
-
-4. 选择 `Music` Scheme 和目标模拟器，点击 Run 运行。
-
-> 注意：安装 CocoaPods 后请打开 `Music.xcworkspace`，不要直接打开 `Music.xcodeproj`，否则 Masonry 依赖可能无法正常链接。
-
-## 核心实现
-
-### 页面入口
-
-`SceneDelegate` 中创建 `MyTabBarVC` 作为根控制器。`MyTabBarVC` 内部包含首页和我的两个 Tab，并管理底部迷你播放器。
-
-### 数据来源
-
-项目中的展示数据集中放在 `HomeModel` 中，目前为本地静态数组，没有接入网络接口。
-
-### 播放器
-
-`MusicPlay` 是播放器单例，负责：
-
-- 设置播放列表和当前播放下标
-- 播放、暂停、上一首、下一首
-- 进度跳转
-- 获取当前播放时间和总时长
-- 通过通知广播当前歌曲和播放状态变化
-
-### 播放状态同步
-
-播放状态变化通过 `kMusicPlayerDidChangeNotification` 通知同步到迷你播放器和播放详情页。
-
-## 依赖说明
-
-项目使用 CocoaPods 管理第三方库：
-
-```ruby
-pod 'Masonry'
-pod 'LookinServer', :configurations => ['Debug']
+```bash
+g++ -std=c++17 main.cpp auth.cpp student.cpp teacher.cpp manager.cpp information.cpp student_manage.cpp file_operation.cpp -o sms
+./sms
 ```
 
-- `Masonry`：用于 Objective-C 自动布局
-- `LookinServer`：仅 Debug 环境使用，便于调试 iOS 页面层级
+## 默认账号
 
-## 资源说明
+程序启动时会自动创建一个管理员账号：
 
-项目包含多张歌曲封面图片和少量本地 `.m4a` 音频文件。歌曲列表中的音频文件名在 `HomeModel.m` 中配置，播放时会从主 Bundle 中读取对应资源。
+```text
+ID: 00001
+密码: admin123
+角色: admin
+```
 
-## 后续优化方向
+学生和教师账号可以通过管理员端手动新增，也可以使用示例文件批量导入。批量导入创建的学生和教师账号默认密码为：
 
-- 接入真实音乐接口或本地数据库
-- 完善搜索、歌单详情、歌词展示等功能
-- 增加播放模式，例如顺序播放、随机播放、单曲循环
-- 优化播放进度拖动交互，补充时间显示
-- 适配更多屏幕尺寸和较低 iOS 版本
-- 为播放器和数据模型补充单元测试
+```text
+123456
+```
 
-## 许可
+## 示例数据格式
 
-本项目仅用于学习和练习 UIKit 开发。
+### 学生账户导入
+
+文件格式：`学号,姓名,班级`
+
+示例：
+
+```text
+00360,阿焦,电路1班
+01563,阿檬,电路1班
+```
+
+### 教师账户导入
+
+文件格式：`工号,姓名,管理班级`
+
+示例：
+
+```text
+2026001,张三,电路1班
+2025001,李四,计算机1班
+```
+
+### 成绩导入
+
+文件格式：`学生ID,姓名,班级,科目:成绩,科目:成绩...`
+
+示例：
+
+```text
+00360,阿焦,电路1班,大学语文:86,高等数学:67,英语:68
+```
+
+注意：成绩导入前，学生账户和学生基础信息需要已经存在，否则会提示学生不存在。
+
+## 使用提示
+
+- 建议先使用管理员账号登录。
+- 进入管理员端后，可以先批量导入 `studentAuth.txt` 和 `teacherAuth.txt`。
+- 学生和教师账户导入完成后，再导入 `studentScore.txt`。
+- 文件导入时请输入相对于当前运行目录的文件名或完整路径。
+- 文本成绩文件支持逗号分隔，科目成绩使用 `科目:成绩` 格式。
+
+## 技术说明
+
+- 语言：C++
+- 运行环境：命令行终端或 Xcode
+- 数据结构：双向链表保存学生信息，单向链表保存学生科目成绩
+- 文件存储：支持文本格式和带文件头校验的二进制格式
