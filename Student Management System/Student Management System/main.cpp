@@ -26,19 +26,19 @@ int main() {
         cout << "4. 退出系统" << endl;
         cout << "---------------------------" << endl;
         cout << "请选择：" << endl;
-        int choice;
+        string choice;
         cin >> choice;
         cout << endl;
-        if (choice == 1) {
+        if (choice == "1") {
             StudentUI studentUI(&manager, &auth);
             studentUI.run();
-        } else if (choice == 2) {
+        } else if (choice == "2") {
             TeacherUI teacherUI(&manager, &auth);
             teacherUI.run();
-        } else if (choice == 3) {
+        } else if (choice == "3") {
             ManagerUI managerUI(&manager, &auth);
             managerUI.run();
-        } else if (choice == 4) {
+        } else if (choice == "4") {
             cout << "感谢使用学生管理系统！再见👋" << endl;
             TeacherUI::waitForEnter();
             return 0;

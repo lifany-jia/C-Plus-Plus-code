@@ -73,33 +73,27 @@ void StudentUI::showMainMenu() {
         cout << "6. 返回上一级" << endl;
         cout << "============================" << endl;
         cout << "请选择：";
-        int choice;
+        string choice;
         cin >> choice;
-        switch (choice) {
-            case 1:
-                queryMyScores();
-                break;
-            case 2:
-                queryClassScores();
-                break;
-            case 3:
-                showClassRanking();
-                break;
-            case 4:
-                auth->changePassword();
-                break;
-            case 5:
-                addAppeal();
-                break;
-            case 6:
-                isLoggedIn = false;
-                auth->logout();
-                cout << "已退出登录！" << endl;
-                waitForEnter();
-                return;
-            default:
-                cout << "❌无效选择" << endl;
-                waitForEnter();
+        if (choice == "1") {
+            queryMyScores();
+        } else if (choice == "2") {
+            queryClassScores();
+        } else if (choice == "3") {
+            showClassRanking();
+        } else if (choice == "4") {
+            auth->changePassword();
+        } else if (choice == "5") {
+            addAppeal();
+        } else if (choice == "6") {
+            isLoggedIn = false;
+            auth->logout();
+            cout << "已退出登录！" << endl;
+            waitForEnter();
+            return;
+        } else {
+            cout << "❌无效选择" << endl;
+            waitForEnter();
         }
     }
 }
@@ -242,7 +236,7 @@ void StudentUI::showClassRanking() {
         cout << "4. 返回🔙" << endl;
         cout << "===================================" << endl;
         cout << "请输入指令：";
-        int choice;
+        string choice;
         cin >> choice;
         cout << endl;
         vector<const Information*> students = getMyClass();
@@ -251,7 +245,7 @@ void StudentUI::showClassRanking() {
             waitForEnter();
             return;
         }
-        if (choice == 1) {
+        if (choice == "1") {
             sort(students.begin(), students.end(),
                  [](const Information* a, const Information* b) {
                 return a->getTotalScore() > b->getTotalScore();
@@ -268,7 +262,7 @@ void StudentUI::showClassRanking() {
                 students[i]->getName() << setw(10) << students[i]->getTotalScore() << endl;
             }
             waitForEnter();
-        } else if (choice == 2) {
+        } else if (choice == "2") {
             map<string, bool> allSubjects;
             StudentNode* stu = manager->getHead();
             while (stu) {
@@ -338,7 +332,7 @@ void StudentUI::showClassRanking() {
                     cout << "❌ 输入错误" << endl;
                 }
             }
-        } else if (choice == 3) {
+        } else if (choice == "3") {
             vector<int> scores;
             StudentNode* stu = manager->getHead();
             while (stu) {
@@ -403,22 +397,22 @@ void StudentUI::addAppeal() {
         cout << "4. 返回上一级" << endl;
         cout << "--------------------------" << endl;
         cout << "请选择：";
-        int choice;
+        string choice;
         cin >> choice;
         cout << endl;
-        if (choice == 1) {
+        if (choice == "1") {
             Appeal appeal(currentStudentId, currentStudentName, "账户密码修改");
             cout << "请写出你的诉求，以及新密码:" << endl;
             cin >> appeal.appeal;
             manager->appeals.push_back(appeal);
             waitForEnter();
-        } else if (choice == 2) {
+        } else if (choice == "2") {
             Appeal appeal(currentStudentId, currentStudentName, "成绩申诉");
             cout << "请写出你的申请理由，以及修改科目和成绩:" << endl;
             cin >> appeal.appeal;
             manager->appeals.push_back(appeal);
             waitForEnter();
-        } else if (choice == 3) {
+        } else if (choice == "3") {
             for (auto& item : manager->appeals) {
                 if (item.id == currentStudentId) {
                     if (item.reply.empty()) {
@@ -432,7 +426,7 @@ void StudentUI::addAppeal() {
                 }
             }
         }
-        else if (choice == 4) return;
+        else if (choice == "4") return;
         else {
             cout << "❌无效指令" << endl;
             waitForEnter();
@@ -450,10 +444,10 @@ bool StudentUI::login() {
         cout << "2. 退出" << endl;
         cout << "============================" << endl;
         cout << "请输入您的指令：" ;
-        int num;
+        string num;
         cin >> num;
         cout << endl;
-        if (num == 1) {
+        if (num == "1") {
             if (auth->login()) {
                 if (auth->getCurrentRole() == "student") {
                     string userId = auth->getCurrentUserId();
@@ -483,7 +477,7 @@ bool StudentUI::login() {
                     auth->logout();
                 }
             }
-        } else if (num == 2) {
+        } else if (num == "2") {
             cout << "已退出登录!" << endl;
             return false;
         } else {

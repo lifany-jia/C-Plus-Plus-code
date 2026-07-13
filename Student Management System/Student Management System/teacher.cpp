@@ -73,70 +73,59 @@ void TeacherUI::showMainMenu() {
         cout << "7. 返回上一级" << endl;
         cout << "===========================" << endl;
         cout << "请选择：";
-        int choice;
+        string choice;
         cin >> choice;
         cout << endl;
-        switch (choice) {
-            case 1:
-                TeacherUI::studentManageMenu(manager);
-                break;
-            case 2:
-                listClassStudents();
-                break;
-            case 3:
-                showClassAverage();
-                break;
-            case 4:
-                cout << "1. 保存为文本文件" << endl;
-                cout << "2. 保存为二进制文件" << endl;
-                int num;
-                cin >> num;
-                cout << endl;
-                switch (num) {
-                    case 1:
-                        FileOperation::saveText(*manager);
-                        waitForEnter();
-                        break;
-                    case 2:
-                        FileOperation::saveBinary(*manager);
-                        waitForEnter();
-                        break;
-                    default:
-                        break;
-                }
-                break;
-            case 5:
-                cout << "1. 文本文件导入" << endl;
-                cout << "2. 二进制文件导入" << endl;
-                int numm;
-                cin >> numm;
-                cout << endl;
-                switch (numm) {
-                    case 1:
-                        FileOperation::loadText(*manager);
-                        waitForEnter();
-                        break;
-                    case 2:
-                        FileOperation::loadBinary(*manager);
-                        waitForEnter();
-                        break;
-                    default:
-                        break;
-                }
-                break;
-            case 6:
-                addAppeal();
-                break;
-            case 7:
-                isLoggedIn = false;
-                isAdminMode = false;
-                auth->logout();
-                cout << "已退出登录！" << endl;
+        if (choice == "1") {
+            TeacherUI::studentManageMenu(manager);
+        } else if (choice == "2") {
+            listClassStudents();
+        } else if (choice == "3") {
+            showClassAverage();
+        } else if (choice == "4") {
+            cout << "1. 保存为文本文件" << endl;
+            cout << "2. 保存为二进制文件" << endl;
+            int num;
+            cin >> num;
+            cout << endl;
+            switch (num) {
+                case 1:
+                    FileOperation::saveText(*manager);
+                    waitForEnter();
+                    break;
+                case 2:
+                    FileOperation::saveBinary(*manager);
+                    waitForEnter();
+                    break;
+                default:
+                    break;
+            }
+        } else if (choice == "5") {
+            cout << "1. 文本文件导入" << endl;
+            cout << "2. 二进制文件导入" << endl;
+            string numm;
+            cin >> numm;
+            cout << endl;
+            if (numm == "1") {
+                FileOperation::loadText(*manager);
                 waitForEnter();
-                break;;
-            default:
-                cout << "❌ 无效选择" << endl;
+            } else if (numm == "2") {
+                FileOperation::loadBinary(*manager);
                 waitForEnter();
+            } else {
+                break;
+            }
+        } else if (choice == "6") {
+            addAppeal();
+        } else if (choice == "7") {
+            isLoggedIn = false;
+            isAdminMode = false;
+            auth->logout();
+            cout << "已退出登录！" << endl;
+            waitForEnter();
+        } else {
+            cout << "❌ 无效选择" << endl;
+            waitForEnter();
         }
     }
 }
@@ -152,48 +141,43 @@ void TeacherUI::studentManageMenu(StudentManage* manager) {
         cout << "5. 返回上一级" << endl;
         cout << "---------------------------------" << endl;
         cout << "请选择：" ;
-        int choice;
+        string choice;
         cin >> choice;
         cout << endl;
-        switch (choice) {
-            case 1:
-                TeacherUI::addStudentSubject(manager);
-                break;
-            case 2:
-                while (true) {
-                    string id;
-                    cout << "请输入删除学生的ID(输入0退出）：" ;
-                    cin >> id;
-                    cout << endl;
-                    if (id == "0") break;
-                    if (manager->removeStudentById(id)) {
-                        cout << id << "删除成功！" << endl;
-                    } else cout << id << "删除失败！" << endl;
+        if (choice == "1") {
+            TeacherUI::addStudentSubject(manager);
+        } else if (choice == "2") {
+            while (true) {
+                string id;
+                cout << "请输入删除学生的ID(输入0退出）：" ;
+                cin >> id;
+                cout << endl;
+                if (id == "0") break;
+                if (manager->removeStudentById(id)) {
+                    cout << id << "删除成功！" << endl;
+                } else cout << id << "删除失败！" << endl;
+            }
+        } else if (choice == "3") {
+            TeacherUI::modifyStudent(manager);
+        } else if (choice == "4") {
+            while (true) {
+                clearScreen();
+                string stu;
+                cout << "请输入学生的ID(输入0退出）：" ;
+                cin >> stu;
+                if (stu == "0") break;
+                Information* stuInfo = manager->getStudentById(stu);
+                if (stuInfo) {
+                    TeacherUI::printStudentDetail(manager,*stuInfo);
+                } else {
+                    cout << "未找到改学生" << endl;
                 }
-                break;
-            case 3:
-                TeacherUI::modifyStudent(manager);
-                break;
-            case 4:
-                while (true) {
-                    clearScreen();
-                    string stu;
-                    cout << "请输入学生的ID(输入0退出）：" ;
-                    cin >> stu;
-                    if (stu == "0") break;
-                    Information* stuInfo = manager->getStudentById(stu);
-                    if (stuInfo) {
-                        TeacherUI::printStudentDetail(manager,*stuInfo);
-                    } else {
-                        cout << "未找到改学生" << endl;
-                    }
-                    waitForEnter();
-                }
-                break;
-            case 5: return;
-            default:
-                cout << "❌ 无效选择" << endl;
                 waitForEnter();
+            }
+        } else if (choice == "5") return;
+        else {
+            cout << "❌ 无效选择" << endl;
+            waitForEnter();
         }
     }
 }
@@ -240,9 +224,9 @@ void TeacherUI::modifyStudent(StudentManage* manager) {
         cout << "6. 返回上一级" << endl;
         cout << "--------------------------------" << endl;
         cout << "请选择：";
-        int choice;
+        string choice;
         cin >> choice;
-        if (choice == 6) return;
+        if (choice == "6") return;
         cout << "\n请输入修改的学生的ID：";
         string id;
         cin >> id;
@@ -254,47 +238,41 @@ void TeacherUI::modifyStudent(StudentManage* manager) {
         }
         string subName, className, name;
         int score;
-        switch (choice) {
-            case 1:
-                cout << "请输入添加科目名称：";
-                cin >> subName;
-                cout << "\n请输入科目成绩：";
-                cin >> score;
-                cout << endl;
-                if (!stu->addSubject(subName, score)) cout << "添加失败！" << endl;
-                break;
-            case 2:
-                cout << "请输入修改科目名称：";
-                cin >> subName;
-                cout << "\n请输入科目成绩：";
-                cin >> score;
-                cout << endl;
-                if (!stu->updateSubjectScore(subName, score)) cout << "修改失败！" << endl;
-                break;
-            case 3:
-                cout << "请输入删除科目名称：";
-                cin >> subName;
-                cout << endl;
-                if (!stu->removeSubject(subName)) cout << "删除失败！" << endl;
-                break;
-            case 4:
-                cout << "请输入修改后的学生姓名：";
-                cin >> name;
-                cout << endl;
-                stu->setName(name);
-                cout << "修改成功！" << endl;
-                waitForEnter();
-                break;
-            case 5:
-                cout << "请输入学生班级：";
-                cin >> className;
-                cout << endl;
-                stu->setClassName(className);
-                break;
-            case 6 : return;
-            default:
-                cout << "❌无效指令" << endl;
-                waitForEnter();
+        if (choice == "1") {
+            cout << "请输入添加科目名称：";
+            cin >> subName;
+            cout << "\n请输入科目成绩：";
+            cin >> score;
+            cout << endl;
+            if (!stu->addSubject(subName, score)) cout << "添加失败！" << endl;
+        } else if (choice == "2") {
+            cout << "请输入修改科目名称：";
+            cin >> subName;
+            cout << "\n请输入科目成绩：";
+            cin >> score;
+            cout << endl;
+            if (!stu->updateSubjectScore(subName, score)) cout << "修改失败！" << endl;
+        } else if (choice == "3") {
+            cout << "请输入删除科目名称：";
+            cin >> subName;
+            cout << endl;
+            if (!stu->removeSubject(subName)) cout << "删除失败！" << endl;
+        } else if (choice == "4") {
+            cout << "请输入修改后的学生姓名：";
+            cin >> name;
+            cout << endl;
+            stu->setName(name);
+            cout << "修改成功！" << endl;
+            waitForEnter();
+        } else if (choice == "5") {
+            cout << "请输入学生班级：";
+            cin >> className;
+            cout << endl;
+            stu->setClassName(className);
+        } else if (choice == "6") return;
+        else {
+            cout << "❌无效指令" << endl;
+            waitForEnter();
         }
     }
 }
@@ -389,22 +367,22 @@ void TeacherUI::addAppeal() {
         cout << "4. 返回上一级" << endl;
         cout << "--------------------------" << endl;
         cout << "请选择：";
-        int choice;
+        string choice;
         cin >> choice;
         cout << endl;
-        if (choice == 1) {
+        if (choice == "1") {
             Appeal appeal(currentTeacherId, currentTeacherName, "账号密码修改");
             cout << "请写出你的诉求，账户ID，新密码:" << endl;
             cin >> appeal.appeal;
             manager->appeals.push_back(appeal);
             waitForEnter();
-        } else if (choice == 2) {
+        } else if (choice == "2") {
             Appeal appeal(currentTeacherId, currentTeacherName, "学生账号注册");
             cout << "请写出注册理由，账号ID，姓名，班级:" << endl;
             cin >> appeal.appeal;
             manager->appeals.push_back(appeal);
             waitForEnter();
-        } else if (choice == 3) {
+        } else if (choice == "3") {
             for (auto& item : manager->appeals) {
                 if (item.id == currentTeacherId) {
                     if (item.reply.empty()) {
@@ -418,7 +396,7 @@ void TeacherUI::addAppeal() {
                 }
             }
         }
-        else if (choice == 4) return;
+        else if (choice == "4") return;
         else {
             cout << "❌无效指令" << endl;
             waitForEnter();
@@ -482,10 +460,10 @@ bool TeacherUI::login() {
         cout << "2. 退出" << endl;
         cout << "==============================" << endl;
         cout << "请输入您的指令：";
-        int choice;
+        string choice;
         cin >> choice;
         cout << endl;
-        if (choice == 1) {
+        if (choice == "1") {
             if (auth->login()) {
                 if (auth->getCurrentRole() == "teacher") {
                     currentTeacherId = auth->getCurrentUserId();
@@ -501,7 +479,7 @@ bool TeacherUI::login() {
                     waitForEnter();
                 }
             }
-        } else if (choice == 2) {
+        } else if (choice == "2") {
             return false;
         } else {
             cout << "❌ 请输入正确指令" << endl;

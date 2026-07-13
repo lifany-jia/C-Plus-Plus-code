@@ -37,34 +37,34 @@ void ManagerUI::mainMenu() {
         cout << "4. 文件操作" << endl;
         cout << "5. 返回上一级" << endl;
         cout << "===============================" << endl;
-        int choice;
+        string choice;
         cout << "请选择：" ;
         cin >> choice;
         cout << endl;
-        if (choice == 1){
+        if (choice == "1"){
             while (true) {
                 TeacherUI::clearScreen();
                 cout << "===============学生管理============" << endl;
                 cout << "1. 学生信息管理" << endl;
                 cout << "2. 用户账户管理" << endl;
                 cout << "3. 返回上一级" << endl;
-                int num;
+                string num;
                 cout << "请选择：" ;
                 cin >> num;
                 cout << endl;
-                if (num == 1) {
+                if (num == "1") {
                     TeacherUI::studentManageMenu(mgr);
-                } else if (num == 2) {
+                } else if (num == "2") {
                     authManager();
                 } else break;
             }
-        } else if (choice == 2) {
+        } else if (choice == "2") {
             loginAsTeacher();
-        } else if (choice == 3) {
+        } else if (choice == "3") {
             viewTasks();
-        } else if (choice == 4) {
+        } else if (choice == "4") {
             fileMenu();
-        } else if (choice == 5) {
+        } else if (choice == "5") {
             isLoggedIn = false;
             auth->logout();
             cout << "已退出登录" << endl;
@@ -97,10 +97,10 @@ void ManagerUI::viewTasks() {
         cout << "1. 处理结束回复" << endl;
         cout << "2. 返回上一级" << endl;
         cout << "请选择：";
-        int choice;
+        string choice;
         cin >> choice;
         cout << endl;
-        if (choice == 1) {
+        if (choice == "1") {
             string id;
             cout << "请输入你的回复账户ID：";
             cin >> id;
@@ -128,13 +128,12 @@ void ManagerUI::authManager() {
         cout << "3. 修改账户密码" << endl;
         cout << "4. 返回上一级" << endl;
         cout << "------------------------------" << endl;
-        int choice;
+        string choice;
         cout << "请选择：" << endl;
         cin >> choice;
         cout << endl;
         string id, className, name, role;
-        switch (choice) {
-            case 1: {
+        if (choice == "1") {
                 while (true) {
                     TeacherUI::clearScreen();
                     cout << "请输入账户ID(输入0退出）：" ;
@@ -166,20 +165,15 @@ void ManagerUI::authManager() {
                     }
                     TeacherUI::waitForEnter();
                 }
-            }
-                break;
-            case 2:
-                auth->deleteUser();
-                break;
-            case 3:
-                auth->changePassword();
-                TeacherUI::waitForEnter();
-                break;
-            case 4: return;
-            default:
-                cout << "❌无效选择" << endl;
-                TeacherUI::waitForEnter();
-                break;
+        } else if (choice == "2") {
+            auth->deleteUser();
+        } else if (choice == "3") {
+            auth->changePassword();
+            TeacherUI::waitForEnter();
+        } else if (choice == "4") return;
+        else{
+            cout << "❌无效选择" << endl;
+            TeacherUI::waitForEnter();
         }
     }
 }
@@ -370,10 +364,10 @@ bool ManagerUI::login() {
         cout << "2. 返回" << endl;
         cout << "----------------------------" << endl;
         cout << "请选择：" << endl;
-        int choice;
+        string choice;
         cin >> choice;
         cout <<endl;
-        if (choice == 1) {
+        if (choice == "1") {
             if (auth->login()) {
                 if (auth->getCurrentRole() == "admin") {
                     currentAdminId = auth->getCurrentUserId();
@@ -387,7 +381,7 @@ bool ManagerUI::login() {
                     TeacherUI::waitForEnter();
                 }
             }
-        } else if (choice == 2) {
+        } else if (choice == "2") {
             return false;
         }
     }
